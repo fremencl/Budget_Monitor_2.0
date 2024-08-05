@@ -159,10 +159,12 @@ selected_years = st.multiselect("Selecciona el año", years, default=['2024'])
 selected_procesos = st.multiselect("Selecciona el proceso", procesos, default=procesos)
 selected_familias = st.multiselect("Selecciona la Familia_Cuenta", familias_cuenta, default=familias_cuenta)
 
-# Aplicar los filtros
+# Aplicar los filtros, incluyendo el filtro de año
 filtered_data = data0[(data0['Ejercicio'].isin(selected_years)) &
                      (data0['Proceso'].isin(selected_procesos)) &
                      (data0['Familia_Cuenta'].isin(selected_familias))]
+
+budget_data_filtered = budget_data[budget_data['Año'].isin(selected_years)]
 
 # GRÁFICO DE TORTA
 st.markdown("### Distribución del Gasto")
@@ -232,7 +234,7 @@ gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].
 gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
 gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
 
-gasto_presupuestado = budget_data.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
+gasto_presupuestado = budget_data_filtered.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
 gasto_presupuestado['Presupuesto'] = gasto_presupuestado['Presupuesto'].round(1)
 
 # Asegurarse de que las columnas son del mismo tipo
@@ -252,7 +254,7 @@ combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 # Evitar duplicación de columnas y preparar para la transposición
 combined_data_display = combined_data.copy()
 combined_data_display.columns = combined_data_display.columns.map(str)
-combined_data_display = combined_data_display.set_index(['Mes', 'Año'])
+combined_data_display = combined_data_display.set_index(['Mes'])
 
 # Renombrar las columnas para claridad
 combined_data_display = combined_data_display.rename(columns={
@@ -262,8 +264,10 @@ combined_data_display = combined_data_display.rename(columns={
 })
 
 # Transponer el DataFrame y resetear el índice
-combined_data_transposed = combined_data_display.T
-combined_data_transposed = combined_data_transposed.reset_index().rename(columns={'index': 'Mes'})
+combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
+
+# Eliminar la columna de año
+combined_data_transposed = combined_data_transposed.drop(columns=['Año'])
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
