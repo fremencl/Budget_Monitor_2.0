@@ -263,11 +263,11 @@ combined_data_display = combined_data_display.rename(columns={
     'Diferencia': 'Diferencia'
 })
 
+# Eliminar la columna de año antes de la transposición
+combined_data_display = combined_data_display.drop(columns=['Año'])
+
 # Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
-
-# Eliminar la columna de año
-combined_data_transposed = combined_data_transposed.drop(columns=['Año'])
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
