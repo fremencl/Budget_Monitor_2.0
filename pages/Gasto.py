@@ -249,13 +249,24 @@ combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['P
 # Ordenar las columnas de manera ascendente
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Evitar duplicación de columnas
+# Evitar duplicación de columnas y preparar para la transposición
 combined_data_display = combined_data.copy()
 combined_data_display.columns = combined_data_display.columns.map(str)
-combined_data_display = combined_data_display.set_index(['Año', 'Mes'])
+combined_data_display = combined_data_display.set_index(['Mes', 'Año'])
 
-# Mostrar la tabla
-st.dataframe(combined_data_display)
+# Renombrar las columnas para claridad
+combined_data_display = combined_data_display.rename(columns={
+    'Valor/mon.inf.': 'Gasto Real',
+    'Presupuesto': 'Gasto Presupuestado',
+    'Diferencia': 'Diferencia'
+})
+
+# Transponer el DataFrame y resetear el índice
+combined_data_transposed = combined_data_display.T
+combined_data_transposed = combined_data_transposed.reset_index().rename(columns={'index': 'Mes'})
+
+# Mostrar la tabla transpuesta en Streamlit
+st.dataframe(combined_data_transposed)
 
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
