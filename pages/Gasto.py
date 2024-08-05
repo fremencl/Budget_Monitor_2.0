@@ -152,7 +152,7 @@ data0 = eliminar_filas_grupo_ceco(data0)
 # FILTROS
 st.markdown("### Filtros")
 years = data0['Ejercicio'].unique().tolist()
-procesos = ['Producción', 'Distribucion', 'Recoleccion', 'Depuracion']
+procesos = ['Produccion', 'Distribucion', 'Recoleccion', 'Depuracion']
 familias_cuenta = ['Materiales', 'Servicios']
 
 selected_years = st.multiselect("Selecciona el año", years, default=['2024'])
