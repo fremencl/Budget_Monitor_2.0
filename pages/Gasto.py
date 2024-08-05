@@ -249,11 +249,13 @@ combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['P
 # Ordenar las columnas de manera ascendente
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Ocultar la primera fila de año y ordenar las columnas
-combined_data_display = combined_data.drop(columns=['Año']).set_index(['Mes'])
-combined_data_display.columns.name = None  # Eliminar el nombre de las columnas
-combined_data_display.index = combined_data_display.index.map(str)  # Convertir índice a string para visualización
-st.dataframe(combined_data_display.T)
+# Evitar duplicación de columnas
+combined_data_display = combined_data.copy()
+combined_data_display.columns = combined_data_display.columns.map(str)
+combined_data_display = combined_data_display.set_index(['Año', 'Mes'])
+
+# Mostrar la tabla
+st.dataframe(combined_data_display)
 
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
