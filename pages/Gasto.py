@@ -301,12 +301,13 @@ col2.plotly_chart(fig_servicios)
 # TABLA GASTO REAL VS PRESUPUESTADO
 st.markdown("#### Tabla de Gasto Real vs Presupuestado")
 
-# Calcular las sumas por año y mes para Gasto Real y Gasto Presupuestado
-gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+# Calcular las sumas por año y mes para Gasto Real
+gasto_real = data0.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
 gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
 gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
 
-gasto_presupuestado = budget_data_filtered.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
+# Calcular las sumas por año y mes para Gasto Presupuestado
+gasto_presupuestado = budget_data.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
 gasto_presupuestado['Presupuesto'] = gasto_presupuestado['Presupuesto'].round(1)
 
 # Asegurarse de que las columnas son del mismo tipo
@@ -317,14 +318,18 @@ gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir
 
 # Crear la tabla combinada
 combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
-
 combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
-
-# Ordenar las columnas de manera ascendente
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
+# Aplicar los filtros después de calcular las sumatorias
+filtered_combined_data = combined_data[
+    (combined_data['Año'].isin(selected_years)) & 
+    (combined_data['Proceso'].isin(selected_procesos)) & 
+    (combined_data['Familia_Cuenta'].isin(selected_familias))
+]
+
 # Evitar duplicación de columnas y preparar para la transposición
-combined_data_display = combined_data.copy()
+combined_data_display = filtered_combined_data.copy()
 combined_data_display.columns = combined_data_display.columns.map(str)
 combined_data_display = combined_data_display.set_index(['Mes'])
 
@@ -337,8 +342,6 @@ combined_data_display = combined_data_display.rename(columns={
 
 # Eliminar la columna de año antes de la transposición
 combined_data_display = combined_data_display.drop(columns=['Año'])
-
-# Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
 
 # Mostrar la tabla transpuesta en Streamlit
