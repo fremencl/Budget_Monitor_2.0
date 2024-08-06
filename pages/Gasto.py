@@ -143,11 +143,127 @@ def eliminar_pares_opuestos(data):
     
     return filtered_df, removed_df
 
-# Ejecutar `eliminar_pares_opuestos`
-data0, removed_data = eliminar_pares_opuestos(data0)
+# Asegurarse de que data0 es un DataFrame
+if isinstance(data0, pd.DataFrame):
+    # Convertir temporalmente 'Período' a tipo numérico para eliminar pares opuestos
+    data0['Período'] = pd.to_numeric(data0['Período'], errors='coerce')
+    
+    # Ejecutar `eliminar_pares_opuestos`
+    data0, removed_data = eliminar_pares_opuestos(data0)  # Capturar ambos DataFrames
+    
+    # Convertir 'Período' de vuelta a cadena si es necesario
+    # data0['Período'] = data0['Período'].astype(str)
+else:
+    st.error("data0 no es un DataFrame")
 
 # Procesamiento de data0
-data0 = eliminar_filas_grupo_ceco(data0)
+if isinstance(data0, pd.DataFrame):
+    data0 = eliminar_filas_grupo_ceco(data0)
+else:
+    st.error("data0 no es un DataFrame antes de eliminar filas con valores específicos en 'Grupo_Ceco'")
+
+# Filtrar filas sin Proceso y Recinto completos
+data0_incomplete = data0[(data0['Proceso'].isna()) & (data0['Recinto'].isna())].copy()
+
+# Convertir columnas a string
+data0_incomplete['Centro de coste'] = data0_incomplete['Centro de coste'].astype(str)
+base_ceco_data['Ceco'] = base_ceco_data['Ceco'].astype(str)
+base_ceco_data['Recinto'] = base_ceco_data['Recinto'].astype(str)
+base_ceco_data['Proceso'] = base_ceco_data['Proceso'].astype(str)
+
+# Verificar si data0 es un DataFrame
+if not isinstance(data0_incomplete, pd.DataFrame):
+    st.error("data0_incomplete no es un DataFrame después del mapeo ceco")
+
+# Mapeo de Proceso utilizando Base_Ceco_2.csv
+if 'Centro de coste' in data0_incomplete.columns:
+    data0_incomplete = data0_incomplete.merge(base_ceco_data[['Ceco', 'Proceso']], how='left', left_on='Centro de coste', right_on='Ceco')
+    if 'Proceso_y' in data0_incomplete.columns:
+        data0_incomplete['Proceso'] = data0_incomplete['Proceso_y']
+        data0_incomplete.drop(columns=['Proceso_y', 'Proceso_x', 'Ceco'], inplace=True)
+else:
+    st.error("No se encontraron las columnas necesarias para el mapeo de Proceso")
+
+# Mapeo de Recinto utilizando Base_Ceco_2.csv
+if 'Centro de coste' in data0_incomplete.columns:
+    data0_incomplete = data0_incomplete.merge(base_ceco_data[['Ceco', 'Recinto']], how='left', left_on='Centro de coste', right_on='Ceco')
+    if 'Recinto_y' in data0_incomplete.columns:
+        data0_incomplete['Recinto'] = data0_incomplete['Recinto_y']
+        data0_incomplete.drop(columns=['Recinto_y', 'Recinto_x', 'Ceco'], inplace=True)
+else:
+    st.error("No se encontraron las columnas necesarias para el mapeo de Recinto")
+
+# Limpieza y normalización de los valores antes del merge
+data0['Centro de coste'] = data0['Centro de coste'].str.strip().str.upper()
+data0_incomplete['Centro de coste'] = data0_incomplete['Centro de coste'].str.strip().str.upper()
+
+combined_data = data0.merge(
+    data0_incomplete[['Centro de coste', 'Proceso', 'Recinto', 'id']],
+    on=['Centro de coste', 'id'],
+    how='left',
+    suffixes=('', '_incomplete')
+)
+
+# Actualizar los valores de 'Proceso' y 'Recinto' en data0
+combined_data['Proceso'] = combined_data['Proceso'].combine_first(combined_data['Proceso_incomplete'])
+combined_data['Recinto'] = combined_data['Recinto'].combine_first(combined_data['Recinto_incomplete'])
+
+combined_data.drop(columns=['Proceso_incomplete', 'Recinto_incomplete'], inplace=True)
+
+# Asignar el DataFrame resultante a data0
+data0 = combined_data
+
+# Convertir todos los valores en la columna 'Proceso' a cadenas para evitar el error de ordenación
+data0['Proceso'] = data0['Proceso'].astype(str)
+data0['Recinto'] = data0['Recinto'].astype(str)
+
+# Paso 1: Calcular el gasto total mensual por proceso, excluyendo "Overhead"
+gasto_mensual_proceso = data0[data0['Proceso'] != 'Overhead'].groupby(['Ejercicio', 'Período', 'Proceso'])['Valor/mon.inf.'].sum().reset_index()
+
+# Paso 2: Calcular el gasto total mensual excluyendo "Overhead"
+gasto_mensual_total_sin_overhead = gasto_mensual_proceso.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+gasto_mensual_total_sin_overhead = gasto_mensual_total_sin_overhead.rename(columns={'Valor/mon.inf.': 'Total_sin_overhead'})
+
+# Paso 3: Calcular las proporciones de cada proceso con respecto al gasto total mensual excluyendo "Overhead"
+gasto_mensual_proceso = gasto_mensual_proceso.merge(gasto_mensual_total_sin_overhead, on=['Ejercicio', 'Período'])
+gasto_mensual_proceso['Proporción'] = gasto_mensual_proceso['Valor/mon.inf.'] / gasto_mensual_proceso['Total_sin_overhead']
+
+# Paso 4: Filtrar solo los datos de "Overhead"
+gasto_overhead = data0[data0['Proceso'] == 'Overhead'].groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+
+# Paso 5: Crear nuevas filas para cada proceso con el monto redistribuido de "Overhead"
+filas_nuevas = []
+
+for _, overhead_row in gasto_overhead.iterrows():
+    ejercicio = overhead_row['Ejercicio']
+    periodo = overhead_row['Período']
+    overhead_valor = overhead_row['Valor/mon.inf.']
+    
+    # Obtener las proporciones de los otros procesos en el mismo período
+    proporciones_procesos = gasto_mensual_proceso[(gasto_mensual_proceso['Ejercicio'] == ejercicio) & 
+                                                  (gasto_mensual_proceso['Período'] == periodo)]
+    
+    for _, proc_row in proporciones_procesos.iterrows():
+        nueva_fila = {
+            'Ejercicio': ejercicio,
+            'Período': periodo,
+            'Proceso': proc_row['Proceso'],
+            'Valor/mon.inf.': overhead_valor * proc_row['Proporción']
+        }
+        filas_nuevas.append(nueva_fila)
+
+# Convertir la lista de nuevas filas a un DataFrame
+filas_nuevas_df = pd.DataFrame(filas_nuevas)
+
+# Paso 6: Agregar las nuevas filas al DataFrame original
+data0 = pd.concat([data0, filas_nuevas_df], ignore_index=True)
+
+# Paso 7: Eliminar las filas correspondientes a "Overhead"
+data0 = data0[data0['Proceso'] != 'Overhead']
+
+# Convertir la columna 'Familia_Cuenta' y 'Recinto' a tipo string
+data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
+data0['Recinto'] = data0['Recinto'].astype(str)
 
 # FILTROS
 st.markdown("### Filtros")
@@ -184,50 +300,6 @@ col2.plotly_chart(fig_servicios)
 
 # TABLA GASTO REAL VS PRESUPUESTADO
 st.markdown("#### Tabla de Gasto Real vs Presupuestado")
-
-# Paso 1: Calcular el gasto total mensual por proceso, excluyendo "Overhead"
-gasto_mensual_proceso = filtered_data[filtered_data['Proceso'] != 'Overhead'].groupby(['Ejercicio', 'Período', 'Proceso'])['Valor/mon.inf.'].sum().reset_index()
-
-# Paso 2: Calcular el gasto total mensual excluyendo "Overhead"
-gasto_mensual_total_sin_overhead = gasto_mensual_proceso.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
-gasto_mensual_total_sin_overhead = gasto_mensual_total_sin_overhead.rename(columns={'Valor/mon.inf.': 'Total_sin_overhead'})
-
-# Paso 3: Calcular las proporciones de cada proceso con respecto al gasto total mensual excluyendo "Overhead"
-gasto_mensual_proceso = gasto_mensual_proceso.merge(gasto_mensual_total_sin_overhead, on=['Ejercicio', 'Período'])
-gasto_mensual_proceso['Proporción'] = gasto_mensual_proceso['Valor/mon.inf.'] / gasto_mensual_proceso['Total_sin_overhead']
-
-# Paso 4: Filtrar solo los datos de "Overhead"
-gasto_overhead = filtered_data[filtered_data['Proceso'] == 'Overhead'].groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
-
-# Paso 5: Crear nuevas filas para cada proceso con el monto redistribuido de "Overhead"
-filas_nuevas = []
-
-for _, overhead_row in gasto_overhead.iterrows():
-    ejercicio = overhead_row['Ejercicio']
-    periodo = overhead_row['Período']
-    overhead_valor = overhead_row['Valor/mon.inf.']
-    
-    # Obtener las proporciones de los otros procesos en el mismo período
-    proporciones_procesos = gasto_mensual_proceso[(gasto_mensual_proceso['Ejercicio'] == ejercicio) & 
-                                                  (gasto_mensual_proceso['Período'] == periodo)]
-    
-    for _, proc_row in proporciones_procesos.iterrows():
-        nueva_fila = {
-            'Ejercicio': ejercicio,
-            'Período': periodo,
-            'Proceso': proc_row['Proceso'],
-            'Valor/mon.inf.': overhead_valor * proc_row['Proporción']
-        }
-        filas_nuevas.append(nueva_fila)
-
-# Convertir la lista de nuevas filas a un DataFrame
-filas_nuevas_df = pd.DataFrame(filas_nuevas)
-
-# Paso 6: Agregar las nuevas filas al DataFrame original
-filtered_data = pd.concat([filtered_data, filas_nuevas_df], ignore_index=True)
-
-# Paso 7: Eliminar las filas correspondientes a "Overhead"
-filtered_data = filtered_data[filtered_data['Proceso'] != 'Overhead']
 
 # Calcular las sumas por año y mes para Gasto Real y Gasto Presupuestado
 gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
