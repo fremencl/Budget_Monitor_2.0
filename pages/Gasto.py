@@ -283,7 +283,7 @@ selected_familias = st.multiselect("Selecciona la Familia_Cuenta", familias_cuen
 
 # Aplicar los filtros después de calcular las sumatorias
 filtered_data = data0[
-    (data0['Año'].isin(selected_years)) & 
+    (data0['Ejercicio'].isin(selected_years)) & 
     (data0['Proceso'].isin(selected_procesos)) & 
     (data0['Familia_Cuenta'].isin(selected_familias)) &
     (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
