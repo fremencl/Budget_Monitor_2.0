@@ -265,6 +265,17 @@ data0 = data0[data0['Proceso'] != 'Overhead']
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
 
+# Generar el enlace de descarga para las filas procesadas
+csv_data0 = convertir_a_csv(data0)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_csv_data0",
+    data=csv_data0,
+    file_name='filas_csv_data0.csv',
+    mime='text/csv',
+)
+
 # FILTROS
 st.markdown("### Filtros")
 years = data0['Ejercicio'].unique().tolist()
