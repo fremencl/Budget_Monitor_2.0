@@ -373,6 +373,11 @@ combined_data_display = combined_data_display.rename(columns={
 
 # Eliminar la columna de año antes de la transposición
 combined_data_display = combined_data_display.drop(columns=['Año'])
+
+# Verificar y renombrar columnas duplicadas
+combined_data_display.columns = pd.io.parsers.ParserBase({'names': combined_data_display.columns})._maybe_dedup_names(combined_data_display.columns)
+
+# Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
 
 # Mostrar la tabla transpuesta en Streamlit
