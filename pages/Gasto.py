@@ -362,7 +362,7 @@ st.write(combined_data.head())
 # Evitar duplicación de columnas y preparar para la transposición
 combined_data_display = combined_data.copy()
 combined_data_display.columns = combined_data_display.columns.map(str)
-combined_data_display = combined_data_display.set_index(['Mes'])
+combined_data_display = combined_data_display.set_index(['Mes', 'Año'])
 
 # Renombrar las columnas para claridad
 combined_data_display = combined_data_display.rename(columns={
@@ -370,19 +370,6 @@ combined_data_display = combined_data_display.rename(columns={
     'Presupuesto': 'Gasto Presupuestado',
     'Diferencia': 'Diferencia'
 })
-
-# Eliminar la columna de año antes de la transposición
-combined_data_display = combined_data_display.drop(columns=['Año'])
-
-# Verificar y renombrar columnas duplicadas manualmente
-def deduplicate_columns(df):
-    cols = pd.Series(df.columns)
-    for dup in cols[cols.duplicated()].unique():
-        cols[cols[cols == dup].index.values.tolist()] = [dup + '_' + str(i) if i != 0 else dup for i in range(sum(cols == dup))]
-    df.columns = cols
-    return df
-
-combined_data_display = deduplicate_columns(combined_data_display)
 
 # Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
