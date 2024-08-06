@@ -282,11 +282,11 @@ selected_procesos = st.multiselect("Selecciona el proceso", procesos, default=pr
 selected_familias = st.multiselect("Selecciona la Familia_Cuenta", familias_cuenta, default=familias_cuenta)
 
 # Aplicar los filtros después de calcular las sumatorias
-filtered_data = combined_data[
-    (combined_data['Año'].isin(selected_years)) & 
-    (combined_data['Proceso'].isin(selected_procesos)) & 
-    (combined_data['Familia_Cuenta'].isin(selected_familias)) &
-    (~combined_data['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
+filtered_data = data0[
+    (data0['Año'].isin(selected_years)) & 
+    (data0['Proceso'].isin(selected_procesos)) & 
+    (data0['Familia_Cuenta'].isin(selected_familias)) &
+    (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
 ]
 
 budget_data_filtered = budget_data[budget_data['Año'].isin(selected_years)]
