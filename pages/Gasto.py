@@ -270,11 +270,10 @@ data0['Recinto'] = data0['Recinto'].astype(str)
 # Definir los filtros dinámicamente a partir de los valores únicos en las columnas correspondientes
 years = data0['Ejercicio'].unique().tolist()
 procesos = data0['Proceso'].unique().tolist()  # Obtener valores únicos de la columna 'Proceso'
-familias_cuenta = data0['Familia_Cuenta'].unique().tolist()  # Obtener valores únicos de la columna 'Familia_Cuenta'
+familias_cuenta = data0['Familia_Cuenta'].dropna().unique().tolist()  # Obtener valores únicos de la columna 'Familia_Cuenta' excluyendo NaN
 
-# Asegurarse de que los valores únicos no incluyan valores nulos
+# Asegurarse de que los valores únicos no incluyan valores nulos (para procesos, si es necesario)
 procesos = [proc for proc in procesos if pd.notna(proc)]
-familias_cuenta = [fam for fam in familias_cuenta if pd.notna(fam)]
 
 # Filtros de Streamlit
 st.markdown("### Filtros")
@@ -326,8 +325,8 @@ col2.plotly_chart(fig_servicios)
 # TABLA GASTO REAL VS PRESUPUESTADO
 st.markdown("#### Tabla de Gasto Real vs Presupuestado")
 
-# Calcular las sumas por año y mes para Gasto Real
-gasto_real = data0.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+# Calcular las sumas por año y mes para Gasto Real usando filtered_data
+gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
 gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
 gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
 
