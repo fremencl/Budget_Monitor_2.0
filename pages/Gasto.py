@@ -270,7 +270,7 @@ data0['Recinto'] = data0['Recinto'].astype(str)
 # Definir los filtros dinámicamente a partir de los valores únicos en las columnas correspondientes
 years = data0['Ejercicio'].unique().tolist()
 procesos = data0['Proceso'].unique().tolist()  # Obtener valores únicos de la columna 'Proceso'
-familias_cuenta = data0['Familia_Cuenta'].dropna().unique().tolist()  # Obtener valores únicos de la columna 'Familia_Cuenta' excluyendo NaN
+familias_cuenta = ['Materiales', 'Servicios']  # Definir directamente las opciones
 
 # Asegurarse de que los valores únicos no incluyan valores nulos (para procesos, si es necesario)
 procesos = [proc for proc in procesos if pd.notna(proc)]
@@ -292,22 +292,22 @@ filtered_data = data0[
 budget_data_filtered = budget_data[budget_data['Año'].isin(selected_years)]
 
 # Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
+#def convertir_a_csv(df):
+    #buffer = io.StringIO()
+    #df.to_csv(buffer, index=False, sep=';')
+    #buffer.seek(0)
+    #return buffer.getvalue()
 
 # Generar el enlace de descarga para las filas procesadas
-csv_filtered_data = convertir_a_csv(filtered_data)
+#csv_filtered_data = convertir_a_csv(filtered_data)
 
 # Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_filtered_data",
-    data=csv_filtered_data,
-    file_name='filas_filtered_data.csv',
-    mime='text/csv',
-)
+#st.download_button(
+    #label="Descargar_filtered_data",
+    #data=csv_filtered_data,
+    #file_name='filas_filtered_data.csv',
+    #mime='text/csv',
+#)
 
 # GRÁFICO DE TORTA
 st.markdown("### Distribución del Gasto")
@@ -346,18 +346,16 @@ gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir
 # Crear la tabla combinada
 combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
 combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
+
+# Filtrar por el año seleccionado en el menú
+if selected_years:
+    combined_data = combined_data[combined_data['Año'].isin(selected_years)]
+    
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
 # Imprimir el encabezado de la tabla combined_data
-st.write("Encabezado de la tabla combined_data:")
-st.write(combined_data.head())
-
-# Aplicar los filtros después de calcular las sumatorias
-#filtered_combined_data = combined_data[
-    #(combined_data['Año'].isin(selected_years)) & 
-    #(combined_data['Proceso'].isin(selected_procesos)) & 
-    #(combined_data['Familia_Cuenta'].isin(selected_familias))
-#]
+#st.write("Encabezado de la tabla combined_data:")
+#st.write(combined_data.head())
 
 # Evitar duplicación de columnas y preparar para la transposición
 combined_data_display = combined_data.copy()
