@@ -350,11 +350,11 @@ st.write("Encabezado de la tabla combined_data:")
 st.write(combined_data.head())
 
 # Aplicar los filtros después de calcular las sumatorias
-filtered_combined_data = combined_data[
-    (combined_data['Año'].isin(selected_years)) & 
-    (combined_data['Proceso'].isin(selected_procesos)) & 
-    (combined_data['Familia_Cuenta'].isin(selected_familias))
-]
+#filtered_combined_data = combined_data[
+    #(combined_data['Año'].isin(selected_years)) & 
+    #(combined_data['Proceso'].isin(selected_procesos)) & 
+    #(combined_data['Familia_Cuenta'].isin(selected_familias))
+#]
 
 # Evitar duplicación de columnas y preparar para la transposición
 combined_data_display = filtered_combined_data.copy()
