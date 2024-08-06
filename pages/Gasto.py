@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import io
 
 # Título de la aplicación
 st.markdown("<h1 style='text-align: center; color: black; font-size: 24px;'>MONITOR GESTIÓN PRESUPUESTARIA</h1>", unsafe_allow_html=True)
@@ -264,6 +265,13 @@ data0 = data0[data0['Proceso'] != 'Overhead']
 # Convertir la columna 'Familia_Cuenta' y 'Recinto' a tipo string
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
+
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
 
 # Generar el enlace de descarga para las filas procesadas
 csv_data0 = convertir_a_csv(data0)
