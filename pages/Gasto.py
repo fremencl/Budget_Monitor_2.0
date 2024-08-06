@@ -374,8 +374,15 @@ combined_data_display = combined_data_display.rename(columns={
 # Eliminar la columna de año antes de la transposición
 combined_data_display = combined_data_display.drop(columns=['Año'])
 
-# Verificar y renombrar columnas duplicadas
-combined_data_display.columns = pd.io.parsers.ParserBase({'names': combined_data_display.columns})._maybe_dedup_names(combined_data_display.columns)
+# Verificar y renombrar columnas duplicadas manualmente
+def deduplicate_columns(df):
+    cols = pd.Series(df.columns)
+    for dup in cols[cols.duplicated()].unique():
+        cols[cols[cols == dup].index.values.tolist()] = [dup + '_' + str(i) if i != 0 else dup for i in range(sum(cols == dup))]
+    df.columns = cols
+    return df
+
+combined_data_display = deduplicate_columns(combined_data_display)
 
 # Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
