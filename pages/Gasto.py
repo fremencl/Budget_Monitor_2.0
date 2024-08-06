@@ -321,6 +321,10 @@ combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], ho
 combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
+# Imprimir el encabezado de la tabla combined_data
+st.write("Encabezado de la tabla combined_data:")
+st.write(combined_data.head())
+
 # Aplicar los filtros después de calcular las sumatorias
 filtered_combined_data = combined_data[
     (combined_data['Año'].isin(selected_years)) & 
