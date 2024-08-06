@@ -266,30 +266,18 @@ data0 = data0[data0['Proceso'] != 'Overhead']
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
 
-# Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
-
-# Generar el enlace de descarga para las filas procesadas
-csv_data0 = convertir_a_csv(data0)
-
-# Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_csv_data0",
-    data=csv_data0,
-    file_name='filas_csv_data0.csv',
-    mime='text/csv',
-)
-
 # FILTROS
-st.markdown("### Filtros")
+# Definir los filtros dinámicamente a partir de los valores únicos en las columnas correspondientes
 years = data0['Ejercicio'].unique().tolist()
-procesos = ['Produccion', 'Distribucion', 'Recoleccion', 'Depuracion']
-familias_cuenta = ['Materiales', 'Servicios']
+procesos = data0['Proceso'].unique().tolist()  # Obtener valores únicos de la columna 'Proceso'
+familias_cuenta = data0['Familia_Cuenta'].unique().tolist()  # Obtener valores únicos de la columna 'Familia_Cuenta'
 
+# Asegurarse de que los valores únicos no incluyan valores nulos
+procesos = [proc for proc in procesos if pd.notna(proc)]
+familias_cuenta = [fam for fam in familias_cuenta if pd.notna(fam)]
+
+# Filtros de Streamlit
+st.markdown("### Filtros")
 selected_years = st.multiselect("Selecciona el año", years, default=['2024'])
 selected_procesos = st.multiselect("Selecciona el proceso", procesos, default=procesos)
 selected_familias = st.multiselect("Selecciona la Familia_Cuenta", familias_cuenta, default=familias_cuenta)
@@ -300,6 +288,24 @@ filtered_data = data0[(data0['Ejercicio'].isin(selected_years)) &
                      (data0['Familia_Cuenta'].isin(selected_familias))]
 
 budget_data_filtered = budget_data[budget_data['Año'].isin(selected_years)]
+
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+
+# Generar el enlace de descarga para las filas procesadas
+csv_filtered_data = convertir_a_csv(filtered_data)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_filtered_data",
+    data=csv_filtered_data,
+    file_name='filas_filtered_data.csv',
+    mime='text/csv',
+)
 
 # GRÁFICO DE TORTA
 st.markdown("### Distribución del Gasto")
