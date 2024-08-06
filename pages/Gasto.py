@@ -281,10 +281,13 @@ selected_years = st.multiselect("Selecciona el año", years, default=['2024'])
 selected_procesos = st.multiselect("Selecciona el proceso", procesos, default=procesos)
 selected_familias = st.multiselect("Selecciona la Familia_Cuenta", familias_cuenta, default=familias_cuenta)
 
-# Aplicar los filtros, incluyendo el filtro de año
-filtered_data = data0[(data0['Ejercicio'].isin(selected_years)) &
-                     (data0['Proceso'].isin(selected_procesos)) &
-                     (data0['Familia_Cuenta'].isin(selected_familias))]
+# Aplicar los filtros después de calcular las sumatorias
+filtered_data = combined_data[
+    (combined_data['Año'].isin(selected_years)) & 
+    (combined_data['Proceso'].isin(selected_procesos)) & 
+    (combined_data['Familia_Cuenta'].isin(selected_familias)) &
+    (~combined_data['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
+]
 
 budget_data_filtered = budget_data[budget_data['Año'].isin(selected_years)]
 
@@ -357,7 +360,7 @@ st.write(combined_data.head())
 #]
 
 # Evitar duplicación de columnas y preparar para la transposición
-combined_data_display = filtered_combined_data.copy()
+combined_data_display = combined_data.copy()
 combined_data_display.columns = combined_data_display.columns.map(str)
 combined_data_display = combined_data_display.set_index(['Mes'])
 
