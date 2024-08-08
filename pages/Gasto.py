@@ -365,30 +365,27 @@ combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['P
 # Filtrar por el año seleccionado en el menú
 if selected_years:
     combined_data = combined_data[combined_data['Año'].isin(selected_years)]
-    
+
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Evitar duplicación de columnas y preparar para la transposición
-combined_data_display = combined_data.copy()
-combined_data_display.columns.name = None  # Eliminar el nombre de las columnas
-combined_data_display.columns = combined_data_display.columns.map(str)
-combined_data_display = combined_data_display.set_index(['Mes', 'Año'])
-
 # Renombrar las columnas para claridad
-combined_data_display = combined_data_display.rename(columns={
+combined_data = combined_data.rename(columns={
     'Valor/mon.inf.': 'Gasto Real',
     'Presupuesto': 'Gasto Presupuestado',
     'Diferencia': 'Diferencia'
 })
 
 # Transponer el DataFrame y resetear el índice
-combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
-
-# Ocultar la primera columna (correlativo de filas)
-#combined_data_transposed = combined_data_transposed.iloc[:, 1:]
+combined_data_transposed = combined_data.T.reset_index().rename(columns={'index': 'Descripción'})
 
 # Ocultar la fila de los años
-#combined_data_transposed = combined_data_transposed[combined_data_transposed['Descripción'] != 'Año']
+combined_data_transposed = combined_data_transposed[combined_data_transposed['Descripción'] != 'Año']
+
+# Eliminar el nombre de las columnas
+combined_data_transposed.columns.name = None
+
+# Ocultar la primera columna (correlativo de filas)
+combined_data_transposed = combined_data_transposed.loc[:, combined_data_transposed.columns != combined_data_transposed.columns[1]]
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
