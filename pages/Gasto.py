@@ -383,8 +383,11 @@ combined_data_display = combined_data_display.rename(columns={
 # Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
 
+# Identificar la primera columna sin nombre
+unnamed_first_col = combined_data_transposed.columns[0]
+
 # Ocultar la primera columna (correlativo de filas)
-combined_data_transposed = combined_data_transposed.drop(combined_data_transposed.columns[0], axis=1)
+combined_data_transposed = combined_data_transposed.drop(columns=[unnamed_first_col])
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
