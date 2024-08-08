@@ -388,7 +388,7 @@ combined_data_transposed = combined_data_display.T.reset_index().rename(columns=
 combined_data_transposed = combined_data_transposed.iloc[:, 1:]
 
 # Ocultar la fila de los años
-combined_data_transposed = combined_data_transposed[combined_data_transposed['Descripción'] != 'Año']
+#combined_data_transposed = combined_data_transposed[combined_data_transposed['Descripción'] != 'Año']
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
