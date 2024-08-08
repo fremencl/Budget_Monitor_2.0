@@ -383,6 +383,9 @@ combined_data_display = combined_data_display.rename(columns={
 # Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
 
+# Ocultar las columnas de "Año" y la primera columna correlativa
+combined_data_transposed = combined_data_transposed.drop(columns=[combined_data_transposed.columns[1], combined_data_transposed.columns[0]])
+
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
 
