@@ -153,7 +153,7 @@ if isinstance(data0, pd.DataFrame):
     data0, removed_data = eliminar_pares_opuestos(data0)  # Capturar ambos DataFrames
     
     # Convertir 'Período' de vuelta a cadena si es necesario
-    # data0['Período'] = data0['Período'].astype(str)
+    data0['Período'] = data0['Período'].astype(str)
 else:
     st.error("data0 no es un DataFrame")
 
@@ -352,10 +352,6 @@ if selected_years:
     combined_data = combined_data[combined_data['Año'].isin(selected_years)]
     
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
-
-# Imprimir el encabezado de la tabla combined_data
-#st.write("Encabezado de la tabla combined_data:")
-#st.write(combined_data.head())
 
 # Evitar duplicación de columnas y preparar para la transposición
 combined_data_display = combined_data.copy()
