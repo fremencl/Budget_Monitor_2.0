@@ -394,30 +394,24 @@ st.dataframe(combined_data_transposed)
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
 
-# Aplicar filtros al gasto real y presupuesto
-filtered_gasto_real = gasto_real[
-    (gasto_real['Año'].isin(selected_years)) & 
-    (gasto_real['Mes'].isin(selected_procesos)) & 
-    (gasto_real['Familia_Cuenta'].isin(selected_familias))
+# Aplicar los filtros definidos al principio
+filtered_data = data0[
+    (data0['Ejercicio'].isin(selected_years)) & 
+    (data0['Proceso'].isin(selected_procesos)) & 
+    (data0['Familia_Cuenta'].isin(selected_familias)) &
+    (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
 ]
 
-filtered_gasto_presupuestado = gasto_presupuestado[
-    (gasto_presupuestado['Año'].isin(selected_years)) & 
-    (gasto_presupuestado['Mes'].isin(selected_procesos)) & 
-    (gasto_presupuestado['Familia_Cuenta'].isin(selected_familias))
+# Calcular el gasto acumulado real usando el DataFrame filtrado
+ultimo_mes_real = filtered_data['Período'].max()
+gasto_acumulado_real = filtered_data[filtered_data['Período'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
+
+# Calcular el gasto acumulado presupuestado usando el DataFrame de presupuesto filtrado
+filtered_budget_data = budget_data[
+    (budget_data['Año'].isin(selected_years)) & 
+    (budget_data['Mes'].astype(int) <= ultimo_mes_real)
 ]
-
-# Obtener el último mes del año seleccionado para el gasto real
-ultimo_mes_real = filtered_gasto_real['Mes'].max()
-
-# Calcular el gasto acumulado real
-gasto_acumulado_real = filtered_gasto_real[filtered_gasto_real['Mes'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
-
-# Verificar si hay datos presupuestados antes de calcular el gasto acumulado presupuestado
-if not filtered_gasto_presupuestado[filtered_gasto_presupuestado['Mes'] <= ultimo_mes_real].empty:
-    gasto_acumulado_presupuestado = filtered_gasto_presupuestado[filtered_gasto_presupuestado['Mes'] <= ultimo_mes_real]['Presupuesto'].sum()
-else:
-    gasto_acumulado_presupuestado = None
+gasto_acumulado_presupuestado = filtered_budget_data['Presupuesto'].sum() if not filtered_budget_data.empty else None
 
 # Aplicar lógica de colores
 if gasto_acumulado_presupuestado is not None and gasto_acumulado_presupuestado != 0:
