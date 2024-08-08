@@ -394,13 +394,15 @@ st.dataframe(combined_data_transposed)
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
 
+# Obtener el último mes del año seleccionado para el gasto real
+ultimo_mes_real = gasto_real[gasto_real['Año'].isin(selected_years)]['Mes'].max()
+
 # Calcular el gasto acumulado real
-ultimo_mes_real = gasto_real['Mes'].max()
-gasto_acumulado_real = gasto_real[gasto_real['Mes'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
+gasto_acumulado_real = gasto_real[(gasto_real['Año'].isin(selected_years)) & (gasto_real['Mes'] <= ultimo_mes_real)]['Valor/mon.inf.'].sum()
 
 # Verificar si hay datos presupuestados antes de calcular el gasto acumulado presupuestado
-if not gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real].empty:
-    gasto_acumulado_presupuestado = gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real]['Presupuesto'].sum()
+if not gasto_presupuestado[(gasto_presupuestado['Año'].isin(selected_years)) & (gasto_presupuestado['Mes'] <= ultimo_mes_real)].empty:
+    gasto_acumulado_presupuestado = gasto_presupuestado[(gasto_presupuestado['Año'].isin(selected_years)) & (gasto_presupuestado['Mes'] <= ultimo_mes_real)]['Presupuesto'].sum()
 else:
     gasto_acumulado_presupuestado = None
 
