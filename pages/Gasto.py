@@ -365,11 +365,14 @@ combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['P
 # Filtrar por el año seleccionado en el menú
 if selected_years:
     combined_data = combined_data[combined_data['Año'].isin(selected_years)]
-
+    
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Eliminar la columna 'Año'
-combined_data_display = combined_data.drop(columns=['Año'])
+# Evitar duplicación de columnas y preparar para la transposición
+combined_data_display = combined_data.copy()
+combined_data_display.columns.name = None  # Eliminar el nombre de las columnas
+combined_data_display.columns = combined_data_display.columns.map(str)
+combined_data_display = combined_data_display.set_index(['Mes', 'Año'])
 
 # Renombrar las columnas para claridad
 combined_data_display = combined_data_display.rename(columns={
@@ -378,20 +381,17 @@ combined_data_display = combined_data_display.rename(columns={
     'Diferencia': 'Diferencia'
 })
 
-# Establecer 'Mes' como índice
-combined_data_display = combined_data_display.set_index('Mes')
+# Transponer el DataFrame y resetear el índice
+combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
 
-# Transponer el DataFrame
-combined_data_transposed = combined_data_display.T
+# Ocultar la primera columna (correlativo de filas)
+#combined_data_transposed = combined_data_transposed.iloc[:, 1:]
 
-# Resetear el índice para que 'Mes' no aparezca como una fila adicional
-combined_data_transposed = combined_data_transposed.reset_index().rename(columns={'index': 'Descripción'})
+# Ocultar la fila de los años
+#combined_data_transposed = combined_data_transposed[combined_data_transposed['Descripción'] != 'Año']
 
-# Mostrar la tabla transpuesta en Streamlit con opciones de estilo para ajustar el ancho de las columnas
-st.dataframe(
-    combined_data_transposed.style.set_properties(**{'width': '50px'})
-)
-
+# Mostrar la tabla transpuesta en Streamlit
+st.dataframe(combined_data_transposed)
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
 
