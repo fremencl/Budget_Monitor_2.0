@@ -358,6 +358,10 @@ gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para ord
 gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
 gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
 
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
 # Crear la tabla combinada
 combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
 combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
@@ -382,8 +386,8 @@ combined_data_display = combined_data_display.rename(columns={
     'Diferencia': 'Diferencia'
 })
 
-# Transponer el DataFrame y resetear el índice
-combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
+# Transponer el DataFrame sin resetear el índice
+combined_data_transposed = combined_data_display.T
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
