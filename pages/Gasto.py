@@ -358,6 +358,10 @@ gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para ord
 gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
 gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
 
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
 # Crear la tabla combinada
 combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
 combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
@@ -368,24 +372,15 @@ if selected_years:
     
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Eliminar la columna 'Año'
-combined_data_display = combined_data.drop(columns=['Año'])
+# Eliminar la columna 'Año' y definir 'Mes' como índice
+combined_data_display = combined_data.drop(columns=['Año']).set_index('Mes')
 
-# Renombrar las columnas para claridad
-combined_data_display = combined_data_display.rename(columns={
-    'Valor/mon.inf.': 'Gasto Real',
-    'Presupuesto': 'Gasto Presupuestado',
-    'Diferencia': 'Diferencia'
-})
-
-# Establecer 'Mes' como índice
-combined_data_display = combined_data_display.set_index('Mes')
+# Eliminar el nombre de las columnas y convertir el índice a string
+combined_data_display.columns.name = None
+combined_data_display.index = combined_data_display.index.map(str)
 
 # Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
-
-# Eliminar la primera columna sin nombre (correlativo de filas)
-combined_data_transposed.columns.name = None
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
