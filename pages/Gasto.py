@@ -297,14 +297,19 @@ selected_years = st.multiselect("Selecciona el año", years, default=['2024'])
 selected_procesos = st.multiselect("Selecciona el proceso", procesos, default=procesos)
 selected_familias = st.multiselect("Selecciona la Familia_Cuenta", familias_cuenta, default=familias_cuenta)
 
-# Aplicar los filtros después de calcular las sumatorias
+# Aplicar filtros
 filtered_data = data0[
     (data0['Ejercicio'].isin(selected_years)) & 
     (data0['Proceso'].isin(selected_procesos)) & 
     (data0['Familia_Cuenta'].isin(selected_familias)) &
     (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
 ]
-budget_data_filtered = budget_data[budget_data['Año'].isin(selected_years)]
+
+# Filtrar budget_data usando los mismos filtros
+filtered_budget_data = budget_data[
+    (budget_data['Año'].isin(selected_years)) &
+    (budget_data['Mes'].astype(int).isin(filtered_data['Período'].astype(int).unique()))
+]
 
 # Función para convertir DataFrame a CSV
 #def convertir_a_csv(df):
@@ -348,8 +353,8 @@ gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].
 gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
 gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
 
-# Calcular las sumas por año y mes para Gasto Presupuestado
-gasto_presupuestado = budget_data.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
+# Calcular las sumas por año y mes para Gasto Presupuestado usando filtered_budget_data
+gasto_presupuestado = filtered_budget_data.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
 gasto_presupuestado['Presupuesto'] = gasto_presupuestado['Presupuesto'].round(1)
 
 # Asegurarse de que las columnas son del mismo tipo
@@ -362,10 +367,7 @@ gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir
 combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
 combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
 
-# Ordenar las columnas de manera ascendente
-#combined_data = combined_data.sort_values(by=['Año', 'Mes'])
-
-# Filtrar por el año seleccionado en el menú
+# Filtrar por el año seleccionado en el menú (aunque ya se ha hecho antes)
 if selected_years:
     combined_data = combined_data[combined_data['Año'].isin(selected_years)]
     
