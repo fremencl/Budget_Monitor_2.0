@@ -368,24 +368,30 @@ if selected_years:
 
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
+# Eliminar la columna 'Año'
+combined_data_display = combined_data.drop(columns=['Año'])
+
 # Renombrar las columnas para claridad
-combined_data = combined_data.rename(columns={
+combined_data_display = combined_data_display.rename(columns={
     'Valor/mon.inf.': 'Gasto Real',
     'Presupuesto': 'Gasto Presupuestado',
     'Diferencia': 'Diferencia'
 })
 
-# Transponer el DataFrame y resetear el índice
-combined_data_transposed = combined_data.T.reset_index().rename(columns={'index': 'Descripción'})
+# Establecer 'Mes' como índice
+combined_data_display = combined_data_display.set_index('Mes')
 
-# Ocultar la fila de los años
-combined_data_transposed = combined_data_transposed[combined_data_transposed['Descripción'] != 'Año']
+# Transponer el DataFrame
+combined_data_transposed = combined_data_display.T
 
-# Eliminar el nombre de las columnas
-combined_data_transposed.columns.name = None
+# Eliminar la fila 'Año' de la transposición (que ahora es una columna)
+combined_data_transposed = combined_data_transposed.loc[combined_data_transposed.index != 'Año']
 
-# Ocultar la primera columna (correlativo de filas)
-combined_data_transposed = combined_data_transposed.loc[:, combined_data_transposed.columns != combined_data_transposed.columns[1]]
+# Resetear el índice para que 'Mes' no aparezca como una fila adicional
+combined_data_transposed = combined_data_transposed.reset_index().rename(columns={'index': 'Descripción'})
+
+# Eliminar la primera columna sin nombre (correlativo de filas)
+combined_data_transposed = combined_data_transposed.drop(columns=[combined_data_transposed.columns[1]])
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
