@@ -297,6 +297,9 @@ selected_years = st.multiselect("Selecciona el año", years, default=['2024'])
 selected_procesos = st.multiselect("Selecciona el proceso", procesos, default=procesos)
 selected_familias = st.multiselect("Selecciona la Familia_Cuenta", familias_cuenta, default=familias_cuenta)
 
+# Verificar si todos los procesos están seleccionados
+all_processes_selected = set(selected_procesos) == set(procesos)
+
 # Aplicar los filtros después de calcular las sumatorias
 filtered_data = data0[
     (data0['Ejercicio'].isin(selected_years)) & 
@@ -311,6 +314,11 @@ budget_data_filtered = budget_data[
     (budget_data['Proceso'].isin(selected_procesos)) & 
     (budget_data['Familia_Cuenta'].isin(selected_familias))
 ]
+
+# Si todos los procesos están seleccionados, incluir presupuesto overhead
+if all_processes_selected:
+    budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
+    budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
 
 # Función para convertir DataFrame a CSV
 #def convertir_a_csv(df):
