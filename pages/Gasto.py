@@ -370,6 +370,7 @@ combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
 # Evitar duplicación de columnas y preparar para la transposición
 combined_data_display = combined_data.copy()
+combined_data_display.columns.name = None  # Eliminar el nombre de las columnas
 combined_data_display.columns = combined_data_display.columns.map(str)
 combined_data_display = combined_data_display.set_index(['Mes', 'Año'])
 
