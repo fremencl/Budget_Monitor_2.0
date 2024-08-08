@@ -363,7 +363,7 @@ combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], ho
 combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
 
 # Ordenar las columnas de manera ascendente
-combined_data = combined_data.sort_values(by=['Año', 'Mes'])
+#combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
 # Filtrar por el año seleccionado en el menú
 if selected_years:
