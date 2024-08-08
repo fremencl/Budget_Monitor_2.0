@@ -384,17 +384,13 @@ combined_data_display = combined_data_display.set_index('Mes')
 # Transponer el DataFrame
 combined_data_transposed = combined_data_display.T
 
-# Eliminar la fila 'Año' de la transposición (que ahora es una columna)
-combined_data_transposed = combined_data_transposed.loc[combined_data_transposed.index != 'Año']
-
 # Resetear el índice para que 'Mes' no aparezca como una fila adicional
 combined_data_transposed = combined_data_transposed.reset_index().rename(columns={'index': 'Descripción'})
 
-# Eliminar la primera columna sin nombre (correlativo de filas)
-combined_data_transposed = combined_data_transposed.drop(columns=[combined_data_transposed.columns[1]])
-
-# Mostrar la tabla transpuesta en Streamlit
-st.dataframe(combined_data_transposed)
+# Mostrar la tabla transpuesta en Streamlit con opciones de estilo para ajustar el ancho de las columnas
+st.dataframe(
+    combined_data_transposed.style.set_properties(**{'width': '50px'})
+)
 
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
