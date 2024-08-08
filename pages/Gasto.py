@@ -245,13 +245,25 @@ for _, overhead_row in gasto_overhead.iterrows():
                                                   (gasto_mensual_proceso['Período'] == periodo)]
     
     for _, proc_row in proporciones_procesos.iterrows():
-        nueva_fila = {
+        # 50% a Materiales
+        nueva_fila_materiales = {
             'Ejercicio': ejercicio,
             'Período': periodo,
             'Proceso': proc_row['Proceso'],
-            'Valor/mon.inf.': overhead_valor * proc_row['Proporción']
+            'Valor/mon.inf.': overhead_valor * proc_row['Proporción'] * 0.5,
+            'Familia_Cuenta': 'Materiales'
         }
-        filas_nuevas.append(nueva_fila)
+        filas_nuevas.append(nueva_fila_materiales)
+        
+        # 50% a Servicios
+        nueva_fila_servicios = {
+            'Ejercicio': ejercicio,
+            'Período': periodo,
+            'Proceso': proc_row['Proceso'],
+            'Valor/mon.inf.': overhead_valor * proc_row['Proporción'] * 0.5,
+            'Familia_Cuenta': 'Servicios'
+        }
+        filas_nuevas.append(nueva_fila_servicios)
 
 # Convertir la lista de nuevas filas a un DataFrame
 filas_nuevas_df = pd.DataFrame(filas_nuevas)
