@@ -368,11 +368,8 @@ if selected_years:
     
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Evitar duplicación de columnas y preparar para la transposición
-combined_data_display = combined_data.copy()
-combined_data_display.columns.name = None  # Eliminar el nombre de las columnas
-combined_data_display.columns = combined_data_display.columns.map(str)
-combined_data_display = combined_data_display.set_index(['Mes', 'Año'])
+# Eliminar la columna 'Año'
+combined_data_display = combined_data.drop(columns=['Año'])
 
 # Renombrar las columnas para claridad
 combined_data_display = combined_data_display.rename(columns={
@@ -381,17 +378,18 @@ combined_data_display = combined_data_display.rename(columns={
     'Diferencia': 'Diferencia'
 })
 
+# Establecer 'Mes' como índice
+combined_data_display = combined_data_display.set_index('Mes')
+
 # Transponer el DataFrame y resetear el índice
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
 
-# Ocultar la primera columna (correlativo de filas)
-#combined_data_transposed = combined_data_transposed.iloc[:, 1:]
-
-# Ocultar la fila de los años
-#combined_data_transposed = combined_data_transposed[combined_data_transposed['Descripción'] != 'Año']
+# Ocultar la primera columna sin nombre (correlativo de filas)
+combined_data_transposed = combined_data_transposed.drop(columns=[combined_data_transposed.columns[1]])
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
+
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
 
