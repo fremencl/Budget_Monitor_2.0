@@ -406,13 +406,20 @@ filtered_data = data0[
 ultimo_mes_real = filtered_data['Período'].max()
 gasto_acumulado_real = filtered_data[filtered_data['Período'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
 
+# Imprimir tipos de datos para verificar
+st.write("Tipos de datos de budget_data:")
+st.write(budget_data.dtypes)
+
+st.write("Tipo de dato de ultimo_mes_real:")
+st.write(type(ultimo_mes_real))
+
 # Asegurarse de que 'Mes' en budget_data es de tipo entero
 budget_data['Mes'] = budget_data['Mes'].astype(int)
 
 # Calcular el gasto acumulado presupuestado usando el DataFrame de presupuesto filtrado
 filtered_budget_data = budget_data[
     (budget_data['Año'].isin(selected_years)) & 
-    (budget_data['Mes'] <= ultimo_mes_real)
+    (budget_data['Mes'] <= int(ultimo_mes_real))  # Asegurarse de que la comparación es correcta
 ]
 gasto_acumulado_presupuestado = filtered_budget_data['Presupuesto'].sum() if not filtered_budget_data.empty else None
 
