@@ -262,6 +262,10 @@ data0 = pd.concat([data0, filas_nuevas_df], ignore_index=True)
 # Paso 7: Eliminar las filas correspondientes a "Overhead"
 data0 = data0[data0['Proceso'] != 'Overhead']
 
+# Ajuste: Convertir 'Ejercicio' y 'Período' a string nuevamente
+data0['Ejercicio'] = data0['Ejercicio'].astype(str)
+data0['Período'] = data0['Período'].astype(str)
+
 # Convertir la columna 'Familia_Cuenta' y 'Recinto' a tipo string
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
@@ -288,7 +292,6 @@ filtered_data = data0[
     (data0['Familia_Cuenta'].isin(selected_familias)) &
     (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
 ]
-
 budget_data_filtered = budget_data[budget_data['Año'].isin(selected_years)]
 
 # Función para convertir DataFrame a CSV
