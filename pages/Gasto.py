@@ -394,34 +394,15 @@ st.dataframe(combined_data_transposed)
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
 
-# Aplicar los filtros definidos al principio
-filtered_data = data0[
-    (data0['Ejercicio'].isin(selected_years)) & 
-    (data0['Proceso'].isin(selected_procesos)) & 
-    (data0['Familia_Cuenta'].isin(selected_familias)) &
-    (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
-]
+# Calcular el gasto acumulado real
+ultimo_mes_real = gasto_real['Mes'].max()
+gasto_acumulado_real = gasto_real[gasto_real['Mes'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
 
-# Calcular el gasto acumulado real usando el DataFrame filtrado
-ultimo_mes_real = filtered_data['Período'].max()
-gasto_acumulado_real = filtered_data[filtered_data['Período'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
-
-# Imprimir tipos de datos para verificar
-st.write("Tipos de datos de budget_data:")
-st.write(budget_data.dtypes)
-
-st.write("Tipo de dato de ultimo_mes_real:")
-st.write(type(ultimo_mes_real))
-
-# Asegurarse de que 'Mes' en budget_data es de tipo entero
-budget_data['Mes'] = budget_data['Mes'].astype(int)
-
-# Calcular el gasto acumulado presupuestado usando el DataFrame de presupuesto filtrado
-filtered_budget_data = budget_data[
-    (budget_data['Año'].isin(selected_years)) & 
-    (budget_data['Mes'] <= int(ultimo_mes_real))  # Asegurarse de que la comparación es correcta
-]
-gasto_acumulado_presupuestado = filtered_budget_data['Presupuesto'].sum() if not filtered_budget_data.empty else None
+# Verificar si hay datos presupuestados antes de calcular el gasto acumulado presupuestado
+if not gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real].empty:
+    gasto_acumulado_presupuestado = gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real]['Presupuesto'].sum()
+else:
+    gasto_acumulado_presupuestado = None
 
 # Aplicar lógica de colores
 if gasto_acumulado_presupuestado is not None and gasto_acumulado_presupuestado != 0:
