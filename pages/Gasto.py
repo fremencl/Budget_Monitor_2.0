@@ -304,7 +304,13 @@ filtered_data = data0[
     (data0['Familia_Cuenta'].isin(selected_familias)) &
     (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
 ]
-budget_data_filtered = budget_data[budget_data['Año'].isin(selected_years)]
+
+# Aplicar los mismos filtros a budget_data
+budget_data_filtered = budget_data[
+    (budget_data['Año'].isin(selected_years)) & 
+    (budget_data['Proceso'].isin(selected_procesos)) & 
+    (budget_data['Familia_Cuenta'].isin(selected_familias))
+]
 
 # Función para convertir DataFrame a CSV
 #def convertir_a_csv(df):
@@ -348,8 +354,8 @@ gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].
 gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
 gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
 
-# Calcular las sumas por año y mes para Gasto Presupuestado
-gasto_presupuestado = budget_data.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
+# Calcular las sumas por año y mes para Gasto Presupuestado usando budget_data_filtered
+gasto_presupuestado = budget_data_filtered.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
 gasto_presupuestado['Presupuesto'] = gasto_presupuestado['Presupuesto'].round(1)
 
 # Asegurarse de que las columnas son del mismo tipo
@@ -363,12 +369,6 @@ combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], ho
 combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
 
 # Ordenar las columnas de manera ascendente
-#combined_data = combined_data.sort_values(by=['Año', 'Mes'])
-
-# Filtrar por el año seleccionado en el menú
-if selected_years:
-    combined_data = combined_data[combined_data['Año'].isin(selected_years)]
-    
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
 # Eliminar la columna 'Año' y definir 'Mes' como índice
