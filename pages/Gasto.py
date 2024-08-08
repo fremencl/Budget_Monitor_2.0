@@ -384,7 +384,7 @@ combined_data_display = combined_data_display.rename(columns={
 combined_data_transposed = combined_data_display.T.reset_index().rename(columns={'index': 'Descripción'})
 
 # Ocultar la primera columna (correlativo de filas)
-combined_data_transposed = combined_data_transposed.iloc[:, 1:]
+combined_data_transposed = combined_data_transposed.iloc[:, 0:]
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
