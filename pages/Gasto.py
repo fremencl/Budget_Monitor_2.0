@@ -459,3 +459,44 @@ fig = go.Figure(go.Indicator(
 
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig)
+
+# Herramienta de analisis diferencial
+# Calcular el diferencial acumulado
+combined_data['Diferencial Acumulado'] = combined_data['Diferencia'].cumsum()
+
+# Crear la gráfica de barras para la diferencia real vs presupuestado
+fig = go.Figure()
+
+# Gráfica de barras para la diferencia mensual
+fig.add_trace(go.Bar(
+    x=combined_data['Mes_Año'],
+    y=combined_data['Diferencia'],
+    name='Diferencia Mensual',
+    marker_color='blue'
+))
+
+# Línea para el diferencial acumulado
+fig.add_trace(go.Scatter(
+    x=combined_data['Mes_Año'],
+    y=combined_data['Diferencial Acumulado'],
+    mode='lines+markers',
+    name='Diferencial Acumulado',
+    line=dict(color='red'),
+    marker=dict(size=8)
+))
+
+# Configurar el eje Y centrado en 0
+fig.update_layout(
+    yaxis=dict(
+        title='Diferencia (Real - Presupuestado)',
+        zeroline=True,
+        zerolinewidth=2,
+        zerolinecolor='black'
+    ),
+    xaxis_title='Mes y Año',
+    title='Análisis de Diferencia entre Gasto Real y Presupuesto',
+    barmode='overlay'
+)
+
+# Mostrar el gráfico en Streamlit
+st.plotly_chart(fig)
