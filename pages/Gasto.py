@@ -461,24 +461,28 @@ fig = go.Figure(go.Indicator(
 st.plotly_chart(fig)
 
 # Herramienta de analisis diferencial
+# Filtrar los datos solo hasta el último mes disponible con datos reales
+ultimo_mes_real = combined_data[combined_data['Diferencia'] != 0]['Mes'].max()
+combined_data_filtered = combined_data[combined_data['Mes'] <= ultimo_mes_real]
+
 # Calcular el diferencial acumulado
-combined_data['Diferencial Acumulado'] = combined_data['Diferencia'].cumsum()
+combined_data_filtered['Diferencial Acumulado'] = combined_data_filtered['Diferencia'].cumsum()
 
 # Crear la gráfica de barras para la diferencia real vs presupuestado
 fig = go.Figure()
 
 # Gráfica de barras para la diferencia mensual
 fig.add_trace(go.Bar(
-    x=combined_data['Mes_Año'],
-    y=combined_data['Diferencia'],
+    x=combined_data_filtered['Mes_Año'],
+    y=combined_data_filtered['Diferencia'],
     name='Diferencia Mensual',
     marker_color='blue'
 ))
 
 # Línea para el diferencial acumulado
 fig.add_trace(go.Scatter(
-    x=combined_data['Mes_Año'],
-    y=combined_data['Diferencial Acumulado'],
+    x=combined_data_filtered['Mes_Año'],
+    y=combined_data_filtered['Diferencial Acumulado'],
     mode='lines+markers',
     name='Diferencial Acumulado',
     line=dict(color='red'),
