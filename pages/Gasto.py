@@ -438,9 +438,9 @@ porcentaje_gastado = (gasto_acumulado_real / presupuesto_anual_total) * 100 if p
 
 # Crear gráfico de indicador (gauge)
 fig = go.Figure(go.Indicator(
-    mode="gauge+number+delta",
+    mode="gauge+number",  # Eliminar 'delta' para ocultar el valor diferencial
     value=porcentaje_gastado,
-    delta={'reference': 100, 'increasing': {'color': "red"}},
+    number={'suffix': "%"},  # Agregar el signo de porcentaje al valor
     gauge={
         'axis': {'range': [0, 100]},
         'bar': {'color': "green"},
