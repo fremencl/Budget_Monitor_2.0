@@ -374,8 +374,7 @@ gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir
 
 # Crear la tabla combinada
 combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
-
-combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
+combined_data['Diferencia'] = (combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']).round(1)
 
 # Ordenar las columnas de manera ascendente
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
