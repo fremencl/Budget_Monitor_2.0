@@ -427,3 +427,34 @@ if gasto_acumulado_presupuestado is not None:
     col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>${gasto_acumulado_presupuestado:.1f}M</strong></div>", unsafe_allow_html=True)
 else:
     col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>No disponible</strong></div>", unsafe_allow_html=True)
+
+# Gauge para mostrar consumo del presupuesto
+# Calcular el presupuesto anual total basado en los filtros aplicados
+presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
+
+# Calcular el porcentaje del presupuesto gastado
+porcentaje_gastado = (gasto_acumulado_real / presupuesto_anual_total) * 100 if presupuesto_anual_total > 0 else 0
+
+# Crear gráfico de indicador (gauge)
+fig = go.Figure(go.Indicator(
+    mode="gauge+number+delta",
+    value=porcentaje_gastado,
+    delta={'reference': 100, 'increasing': {'color': "red"}},
+    gauge={
+        'axis': {'range': [0, 100]},
+        'bar': {'color': "green"},
+        'steps': [
+            {'range': [0, 75], 'color': "lightgreen"},
+            {'range': [75, 100], 'color': "yellow"},
+        ],
+        'threshold': {
+            'line': {'color': "red", 'width': 4},
+            'thickness': 0.75,
+            'value': 100
+        }
+    },
+    title={'text': "Porcentaje del Presupuesto Anual Gastado"}
+))
+
+# Mostrar el gráfico en Streamlit
+st.plotly_chart(fig)
