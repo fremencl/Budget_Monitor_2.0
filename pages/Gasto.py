@@ -372,8 +372,14 @@ gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para ord
 gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
 gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
 
+# Filtrar el DataFrame de presupuesto para incluir solo hasta diciembre 2024
+budget_data_filtered = budget_data[
+    (budget_data['Año'].astype(int) <= 2024) & 
+    (budget_data['Mes'].astype(int) <= 12)
+]
+
 # Crear la tabla combinada
-combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
+combined_data = pd.merge(gasto_real, budget_data_filtered, on=['Año', 'Mes'], how='outer').fillna(0)
 combined_data['Diferencia'] = (combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']).round(1)
 
 # Ordenar las columnas de manera ascendente
