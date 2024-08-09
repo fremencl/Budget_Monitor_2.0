@@ -378,6 +378,10 @@ budget_data_filtered = budget_data[
     (budget_data['Mes'].astype(int) <= 12)
 ]
 
+# Asegurarse de que las columnas 'Mes' en ambos DataFrames son del mismo tipo
+gasto_real['Mes'] = gasto_real['Mes'].astype(int)
+budget_data_filtered['Mes'] = budget_data_filtered['Mes'].astype(int)
+
 # Crear la tabla combinada
 combined_data = pd.merge(gasto_real, budget_data_filtered, on=['Año', 'Mes'], how='outer').fillna(0)
 combined_data['Diferencia'] = (combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']).round(1)
