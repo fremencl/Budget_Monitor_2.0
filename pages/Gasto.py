@@ -7,6 +7,23 @@ import io
 st.markdown("<h1 style='text-align: center; color: black; font-size: 24px;'>MONITOR GESTIÓN PRESUPUESTARIA</h1>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; color: black; font-size: 24px;'>ANALISIS AGREGADO: GASTO Y PRESUPUESTO</h2>", unsafe_allow_html=True)
 
+ CSS para ajustar el ancho del sidebar
+st.markdown(
+    """
+    <style>
+    /* Ajustar el ancho del sidebar */
+    [data-testid="stSidebar"] {
+        width: 300px;
+    }
+    /* Ajustar el contenido del sidebar */
+    [data-testid="stSidebar"] > div:first-child {
+        width: 300px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Definimos las URLs de los archivos de referencia
 DATA0_URL = 'https://streamlitmaps.s3.amazonaws.com/Data_0624.csv'
 BUDGET_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Presupuesto_3.csv'
