@@ -13,11 +13,11 @@ st.markdown(
     <style>
     /* Ajustar el ancho del sidebar */
     [data-testid="stSidebar"] {
-        width: 250px;
+        width: 300px;
     }
     /* Ajustar el contenido del sidebar */
     [data-testid="stSidebar"] > div:first-child {
-        width: 250px;
+        width: 300px;
     }
     </style>
     """,
