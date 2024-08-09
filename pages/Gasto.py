@@ -282,23 +282,14 @@ data0['Período'] = data0['Período'].astype(str)
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
 
-# FILTROS
-# Definir los filtros dinámicamente a partir de los valores únicos en las columnas correspondientes
-years = data0['Ejercicio'].unique().tolist()
-procesos = data0['Proceso'].unique().tolist()  # Obtener valores únicos de la columna 'Proceso'
-familias_cuenta = ['Materiales', 'Servicios']  # Definir directamente las opciones
-
-# Asegurarse de que los valores únicos no incluyan valores nulos (para procesos, si es necesario)
-procesos = [proc for proc in procesos if pd.notna(proc)]
-
-# Filtros de Streamlit
-st.markdown("### Filtros")
-selected_years = st.multiselect("Selecciona el año", years, default=['2024'])
-selected_procesos = st.multiselect("Selecciona el proceso", procesos, default=procesos)
-selected_familias = st.multiselect("Selecciona la Familia_Cuenta", familias_cuenta, default=familias_cuenta)
+# FILTROS en la barra lateral
+st.sidebar.markdown("### Filtros")
+selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio'].unique().tolist(), default=['2024'])
+selected_procesos = st.sidebar.multiselect("Selecciona el proceso", data0['Proceso'].unique().tolist(), default=data0['Proceso'].unique().tolist())
+selected_familias = st.sidebar.multiselect("Selecciona la Familia_Cuenta", ['Materiales', 'Servicios'], default=['Materiales', 'Servicios'])
 
 # Verificar si todos los procesos están seleccionados
-all_processes_selected = set(selected_procesos) == set(procesos)
+all_processes_selected = set(selected_procesos) == set(data0['Proceso'].unique().tolist())
 
 # Aplicar los filtros después de calcular las sumatorias
 filtered_data = data0[
@@ -319,24 +310,6 @@ budget_data_filtered = budget_data[
 if all_processes_selected:
     budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
     budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
-
-# Función para convertir DataFrame a CSV
-#def convertir_a_csv(df):
-    #buffer = io.StringIO()
-    #df.to_csv(buffer, index=False, sep=';')
-    #buffer.seek(0)
-    #return buffer.getvalue()
-
-# Generar el enlace de descarga para las filas procesadas
-#csv_filtered_data = convertir_a_csv(filtered_data)
-
-# Agregar un botón de descarga en la aplicación
-#st.download_button(
-    #label="Descargar_filtered_data",
-    #data=csv_filtered_data,
-    #file_name='filas_filtered_data.csv',
-    #mime='text/csv',
-#)
 
 # GRÁFICO DE TORTA
 st.markdown("### Distribución del Gasto")
