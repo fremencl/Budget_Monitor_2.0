@@ -374,23 +374,22 @@ gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir
 
 # Crear la tabla combinada
 combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
-
-combined_data['Diferencia'] = (combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']).round(1)
+combined_data['Diferencia'] = combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']
 
 # Ordenar las columnas de manera ascendente
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Evitar duplicación de columnas y preparar para la transposición
-combined_data_display = combined_data.copy()
+# Eliminar las columnas 'Año' y 'Mes' y definir el índice temporalmente como el periodo concatenado
+combined_data['Mes_Año'] = combined_data.apply(lambda x: f"{x['Mes']}_{x['Año']}", axis=1)
+combined_data_display = combined_data.drop(columns=['Año', 'Mes']).set_index('Mes_Año')
 
-# Convertir el índice a una tupla de ('Mes', 'Año') para evitar duplicaciones al transponer
-combined_data_display['Mes_Año'] = combined_data_display.apply(lambda x: f"{x['Mes']}_{x['Año']}", axis=1)
-combined_data_display = combined_data_display.set_index('Mes_Año')
+# Eliminar el nombre de las columnas
+combined_data_display.columns.name = None
 
 # Renombrar las columnas para claridad
 combined_data_display = combined_data_display.rename(columns={
     'Valor/mon.inf.': 'Gasto Real',
-    'Presupuesto': 'Gasto Presupuestado',
+    'Presupuesto': 'Presupuesto',
     'Diferencia': 'Diferencia'
 })
 
