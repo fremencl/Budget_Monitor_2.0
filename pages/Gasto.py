@@ -372,25 +372,19 @@ gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para ord
 gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
 gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
 
-# Asegurarse de que las columnas 'Mes' en ambos DataFrames son del mismo tipo
-gasto_real['Mes'] = gasto_real['Mes'].astype(int)
-budget_data_filtered['Mes'] = budget_data_filtered['Mes'].astype(int)
-
 # Crear la tabla combinada
-combined_data = pd.merge(gasto_real, budget_data_filtered, on=['Año', 'Mes'], how='outer').fillna(0)
+combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
 combined_data['Diferencia'] = (combined_data['Valor/mon.inf.'] - combined_data['Presupuesto']).round(1)
 
 # Ordenar las columnas de manera ascendente
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Crear una nueva columna 'Mes_Año' para generar nombres únicos
-combined_data['Mes_Año'] = combined_data.apply(lambda x: f"{x['Mes']}_{x['Año']}", axis=1)
+# Eliminar la columna 'Año' y definir 'Mes' como índice
+combined_data_display = combined_data.drop(columns=['Año']).set_index('Mes')
 
-# Eliminar las columnas 'Año' y 'Mes', y usar 'Mes_Año' como índice
-combined_data_display = combined_data.drop(columns=['Año', 'Mes']).set_index('Mes_Año')
-
-# Eliminar el nombre de las columnas
+# Eliminar el nombre de las columnas y convertir el índice a string
 combined_data_display.columns.name = None
+combined_data_display.index = combined_data_display.index.map(str)
 
 # Renombrar las columnas para claridad
 combined_data_display = combined_data_display.rename(columns={
