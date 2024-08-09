@@ -9,7 +9,7 @@ st.markdown("<h2 style='text-align: center; color: black; font-size: 24px;'>ANAL
 
 # Definimos las URLs de los archivos de referencia
 DATA0_URL = 'https://streamlitmaps.s3.amazonaws.com/Data_0624.csv'
-BUDGET_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Presupuesto_2.csv'
+BUDGET_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Presupuesto_3.csv'
 ORDERS_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Ordenes_0624.csv'
 BASE_UTEC_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_UTEC_BudgetVersion.csv'
 BASE_CECO_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Ceco_3.csv'
