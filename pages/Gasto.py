@@ -379,21 +379,21 @@ combined_data['Diferencia'] = (combined_data['Valor/mon.inf.'] - combined_data['
 # Ordenar las columnas de manera ascendente
 combined_data = combined_data.sort_values(by=['Año', 'Mes'])
 
-# Evitar duplicación de columnas y preparar para la transposición
-combined_data_display = combined_data.copy()
+# Eliminar la columna 'Año' y definir 'Mes' como índice
+combined_data_display = combined_data.drop(columns=['Año']).set_index('Mes')
 
-# Convertir el índice a una tupla de ('Mes', 'Año') para evitar duplicaciones al transponer
-combined_data_display['Mes_Año'] = combined_data_display.apply(lambda x: f"{x['Mes']}_{x['Año']}", axis=1)
-combined_data_display = combined_data_display.set_index('Mes_Año')
+# Eliminar el nombre de las columnas y convertir el índice a string
+combined_data_display.columns.name = None
+combined_data_display.index = combined_data_display.index.map(str)
 
 # Renombrar las columnas para claridad
 combined_data_display = combined_data_display.rename(columns={
     'Valor/mon.inf.': 'Gasto Real',
-    'Presupuesto': 'Gasto Presupuestado',
+    'Presupuesto': 'Presupuesto',
     'Diferencia': 'Diferencia'
 })
 
-# Transponer el DataFrame
+# Transponer el DataFrame sin resetear el índice
 combined_data_transposed = combined_data_display.T
 
 # Mostrar la tabla transpuesta en Streamlit
