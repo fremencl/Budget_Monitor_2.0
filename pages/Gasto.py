@@ -462,11 +462,8 @@ st.plotly_chart(fig)
 
 # Herramienta de analisis diferencial
 # Filtrar los datos solo hasta el último mes disponible con datos reales
-ultimo_mes_real = combined_data[combined_data['Diferencia'] != 0]['Mes'].max()
+ultimo_mes_real = gasto_real['Mes'].max()
 combined_data_filtered = combined_data[combined_data['Mes'] <= ultimo_mes_real]
-
-# Calcular el diferencial acumulado
-combined_data_filtered['Diferencial Acumulado'] = combined_data_filtered['Diferencia'].cumsum()
 
 # Crear la gráfica de barras para la diferencia real vs presupuestado
 fig = go.Figure()
