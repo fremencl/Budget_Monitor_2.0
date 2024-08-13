@@ -361,6 +361,8 @@ gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para ord
 gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
 gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
 
+st.markdown("---")
+
 # Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Hasta el momento llevamos...")
 
@@ -454,7 +456,7 @@ else:
 
 # Gauge para mostrar consumo del presupuesto
 # Calcular el presupuesto anual total basado en los filtros aplicados
-st.markdown("#### Que % del presupuesto hemos gastado...")
+st.markdown("#### Que % del presupuesto hemos gastado?")
 presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
 
 # Calcular el porcentaje del presupuesto gastado
