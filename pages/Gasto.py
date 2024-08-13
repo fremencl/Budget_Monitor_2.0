@@ -471,8 +471,11 @@ combined_data_filtered = combined_data[combined_data['Mes'] <= ultimo_mes_real].
 todos_los_meses = pd.DataFrame({'Mes': range(1, 13), 'Año': '2024'})
 combined_data_filtered = pd.merge(todos_los_meses, combined_data_filtered, on=['Año', 'Mes'], how='left').fillna(0)
 
-# Calcular el diferencial acumulado
-combined_data_filtered['Diferencial Acumulado'] = combined_data_filtered['Diferencia'].cumsum()
+# Asegurarse de que la columna 'Mes_Año' está en el formato correcto después de agregar los meses faltantes
+combined_data_filtered['Mes_Año'] = combined_data_filtered['Mes'].astype(str) + '_2024'
+
+# Calcular el diferencial acumulado desde cero y agregar un valor inicial de cero
+diferencial_acumulado = [0] + combined_data_filtered['Diferencia'].cumsum().tolist()
 
 # Crear la gráfica de barras para la diferencia real vs presupuestado
 fig = go.Figure()
@@ -487,8 +490,8 @@ fig.add_trace(go.Bar(
 
 # Línea para el diferencial acumulado
 fig.add_trace(go.Scatter(
-    x=combined_data_filtered['Mes_Año'],
-    y=[0] + combined_data_filtered['Diferencial Acumulado'].tolist(),  # Incluir 0 al inicio
+    x=['0_2024'] + combined_data_filtered['Mes_Año'].tolist(),  # Iniciar desde el origen
+    y=diferencial_acumulado,
     mode='lines+markers',
     name='Diferencial Acumulado',
     line=dict(color='red'),
@@ -508,7 +511,7 @@ fig.update_layout(
     barmode='overlay',
     xaxis=dict(
         tickmode='array',
-        tickvals=[f'{i}_2024' for i in range(1, 13)],  # Mostrar todos los meses del año
+        tickvals=[f'{i}_2024' for i in range(1, 13)],  # Asegurar que todos los meses del año se muestran
         ticktext=['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
     )
 )
