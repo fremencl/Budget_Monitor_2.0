@@ -452,6 +452,38 @@ if proyeccion_final > 0:
 else:
     st.markdown(f"Si el gasto medio mensual se mantiene, **terminarás el año con un déficit de ${-proyeccion_final:.1f}M** en el presupuesto.")
 
+# Gauge para mostrar consumo del presupuesto
+# Calcular el presupuesto anual total basado en los filtros aplicados
+st.markdown("#### Que % del presupuesto hemos gastado...")
+presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
+
+# Calcular el porcentaje del presupuesto gastado
+porcentaje_gastado = (gasto_acumulado_real / presupuesto_anual_total) * 100 if presupuesto_anual_total > 0 else 0
+
+# Crear gráfico de indicador (gauge)
+fig = go.Figure(go.Indicator(
+    mode="gauge+number",  # Eliminar 'delta' para ocultar el valor diferencial
+    value=porcentaje_gastado,
+    number={'suffix': "%"},  # Agregar el signo de porcentaje al valor
+    gauge={
+        'axis': {'range': [0, 100]},
+        'bar': {'color': "green"},
+        'steps': [
+            {'range': [0, 58], 'color': "lightgreen"},
+            {'range': [58, 100], 'color': "yellow"},
+        ],
+        'threshold': {
+            'line': {'color': "red", 'width': 4},
+            'thickness': 0.75,
+            'value': 100
+        }
+    },
+    title={'text': "Porcentaje del Presupuesto Anual Consumido"}
+))
+
+# Mostrar el gráfico en Streamlit
+st.plotly_chart(fig)
+
 # TABLA GASTO REAL VS PRESUPUESTADO
 st.markdown("#### Tabla de Gasto Real vs Presupuestado")
 
@@ -481,37 +513,6 @@ combined_data_transposed = combined_data_display.T
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
-
-# Gauge para mostrar consumo del presupuesto
-# Calcular el presupuesto anual total basado en los filtros aplicados
-presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
-
-# Calcular el porcentaje del presupuesto gastado
-porcentaje_gastado = (gasto_acumulado_real / presupuesto_anual_total) * 100 if presupuesto_anual_total > 0 else 0
-
-# Crear gráfico de indicador (gauge)
-fig = go.Figure(go.Indicator(
-    mode="gauge+number",  # Eliminar 'delta' para ocultar el valor diferencial
-    value=porcentaje_gastado,
-    number={'suffix': "%"},  # Agregar el signo de porcentaje al valor
-    gauge={
-        'axis': {'range': [0, 100]},
-        'bar': {'color': "green"},
-        'steps': [
-            {'range': [0, 58], 'color': "lightgreen"},
-            {'range': [58, 100], 'color': "yellow"},
-        ],
-        'threshold': {
-            'line': {'color': "red", 'width': 4},
-            'thickness': 0.75,
-            'value': 100
-        }
-    },
-    title={'text': "Porcentaje del Presupuesto Anual Gastado"}
-))
-
-# Mostrar el gráfico en Streamlit
-st.plotly_chart(fig)
 
 # Herramienta de análisis diferencial
 # Filtrar los datos solo hasta el último mes disponible con datos reales
