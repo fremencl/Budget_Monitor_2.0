@@ -511,4 +511,10 @@ fig.update_layout(
     barmode='overlay',
     xaxis=dict(
         tickmode='array',
-        tickvals=[f'{i}_2024' for i in
+        tickvals=[f'{i}_2024' for i in range(1, 13)],  # Asegurar que todos los meses del año se muestran
+        ticktext=['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+    )
+)
+
+# Mostrar el gráfico en Streamlit
+st.plotly_chart(fig)
