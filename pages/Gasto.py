@@ -361,7 +361,7 @@ gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para ord
 gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
 gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
 
-# Nueva sección: Widgets de Gasto Acumulado (MOVER AQUI)
+# Nueva sección: Widgets de Gasto Acumulado
 st.markdown("#### Gasto Acumulado")
 
 # Calcular el gasto acumulado real
@@ -402,6 +402,7 @@ else:
 
 # Texto dinamico con recomendaciones
 # Paso 1: Calcular el presupuesto disponible
+st.markdown("#### Algunas Proyecciones...")
 presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
 gasto_acumulado_real = gasto_real['Valor/mon.inf.'].sum()
 presupuesto_disponible = presupuesto_anual_total - gasto_acumulado_real
