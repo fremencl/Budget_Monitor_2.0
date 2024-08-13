@@ -529,21 +529,35 @@ gasto_medio = gasto_acumulado_real / len(gasto_real)  # len(gasto_real) nos da e
 meses_restantes = 12 - len(gasto_real)
 proyeccion_final = presupuesto_disponible - (gasto_medio * meses_restantes)
 
-# Paso 4: Mostrar los widgets con lógica de colores
+# Definir el presupuesto medio mensual
+presupuesto_medio_mensual = 767  # En millones de pesos
+
+# Paso 4: Mostrar los widgets con la nueva lógica de colores
 col1, col2, col3 = st.columns(3)
 
-# Presupuesto disponible
-color_presupuesto_disponible = 'green' if presupuesto_disponible > 0 else 'red'
-col1.markdown(f"<div style='background-color:{color_presupuesto_disponible}; padding: 10px; border-radius: 5px; text-align: center;'>"
+# Presupuesto disponible - siempre verde
+col1.markdown(f"<div style='background-color:green; padding: 10px; border-radius: 5px; text-align: center;'>"
               f"<strong>Presupuesto Disponible</strong><br>${presupuesto_disponible:.1f}M</div>", unsafe_allow_html=True)
 
-# Gasto medio
-color_gasto_medio = 'green' if gasto_medio < (presupuesto_anual_total / 12) else 'red'
+# Gasto medio mensual con lógica de colores
+if abs(gasto_medio - presupuesto_medio_mensual) <= presupuesto_medio_mensual * 0.05:
+    color_gasto_medio = 'green'
+elif abs(gasto_medio - presupuesto_medio_mensual) <= presupuesto_medio_mensual * 0.10:
+    color_gasto_medio = 'yellow'
+else:
+    color_gasto_medio = 'red'
+
 col2.markdown(f"<div style='background-color:{color_gasto_medio}; padding: 10px; border-radius: 5px; text-align: center;'>"
               f"<strong>Gasto Medio Mensual</strong><br>${gasto_medio:.1f}M</div>", unsafe_allow_html=True)
 
-# Proyección de fin de año
-color_proyeccion_final = 'green' if proyeccion_final > 0 else 'red'
+# Proyección de fin de año con lógica de colores basada en el presupuesto anual
+if abs(proyeccion_final) <= presupuesto_anual_total * 0.05:
+    color_proyeccion_final = 'green'
+elif abs(proyeccion_final) <= presupuesto_anual_total * 0.10:
+    color_proyeccion_final = 'yellow'
+else:
+    color_proyeccion_final = 'red'
+
 col3.markdown(f"<div style='background-color:{color_proyeccion_final}; padding: 10px; border-radius: 5px; text-align: center;'>"
               f"<strong>Proyección a Fin de Año</strong><br>${proyeccion_final:.1f}M</div>", unsafe_allow_html=True)
 
@@ -552,4 +566,3 @@ if proyeccion_final > 0:
     st.markdown(f"Si el gasto medio mensual se mantiene, **terminarás el año con un excedente de ${proyeccion_final:.1f}M** en el presupuesto.")
 else:
     st.markdown(f"Si el gasto medio mensual se mantiene, **terminarás el año con un déficit de ${-proyeccion_final:.1f}M** en el presupuesto.")
-
