@@ -345,6 +345,45 @@ col1, col2 = st.columns(2)
 col1.plotly_chart(fig_materiales)
 col2.plotly_chart(fig_servicios)
 
+# Nueva sección: Widgets de Gasto Acumulado (MOVER AQUI)
+st.markdown("#### Gasto Acumulado")
+
+# Calcular el gasto acumulado real
+ultimo_mes_real = gasto_real['Mes'].max()
+gasto_acumulado_real = gasto_real[gasto_real['Mes'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
+
+# Verificar si hay datos presupuestados antes de calcular el gasto acumulado presupuestado
+if not gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real].empty:
+    gasto_acumulado_presupuestado = gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real]['Presupuesto'].sum()
+else:
+    gasto_acumulado_presupuestado = None
+
+# Aplicar lógica de colores
+if gasto_acumulado_presupuestado is not None and gasto_acumulado_presupuestado != 0:
+    diferencia_porcentaje = (gasto_acumulado_real / gasto_acumulado_presupuestado) * 100
+
+    if diferencia_porcentaje <= 100:
+        color_real = 'background-color: green;'
+        color_presupuesto = 'background-color: green;'
+    elif 100 < diferencia_porcentaje <= 110:
+        color_real = 'background-color: yellow;'
+        color_presupuesto = 'background-color: yellow;'
+    else:
+        color_real = 'background-color: red;'
+        color_presupuesto = 'background-color: red;'
+else:
+    color_real = 'background-color: grey;'
+    color_presupuesto = 'background-color: grey;'
+
+# Mostrar los widgets alineados horizontalmente
+col1, col2 = st.columns(2)
+
+col1.markdown(f"<div style='{color_real} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado real<br><strong>${gasto_acumulado_real:.1f}M</strong></div>", unsafe_allow_html=True)
+if gasto_acumulado_presupuestado is not None:
+    col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>${gasto_acumulado_presupuestado:.1f}M</strong></div>", unsafe_allow_html=True)
+else:
+    col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>No disponible</strong></div>", unsafe_allow_html=True)
+
 # TABLA GASTO REAL VS PRESUPUESTADO
 st.markdown("#### Tabla de Gasto Real vs Presupuestado")
 
@@ -389,45 +428,6 @@ combined_data_transposed = combined_data_display.T
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
-
-# Nueva sección: Widgets de Gasto Acumulado
-st.markdown("#### Gasto Acumulado")
-
-# Calcular el gasto acumulado real
-ultimo_mes_real = gasto_real['Mes'].max()
-gasto_acumulado_real = gasto_real[gasto_real['Mes'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
-
-# Verificar si hay datos presupuestados antes de calcular el gasto acumulado presupuestado
-if not gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real].empty:
-    gasto_acumulado_presupuestado = gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real]['Presupuesto'].sum()
-else:
-    gasto_acumulado_presupuestado = None
-
-# Aplicar lógica de colores
-if gasto_acumulado_presupuestado is not None and gasto_acumulado_presupuestado != 0:
-    diferencia_porcentaje = (gasto_acumulado_real / gasto_acumulado_presupuestado) * 100
-
-    if diferencia_porcentaje <= 100:
-        color_real = 'background-color: green;'
-        color_presupuesto = 'background-color: green;'
-    elif 100 < diferencia_porcentaje <= 110:
-        color_real = 'background-color: yellow;'
-        color_presupuesto = 'background-color: yellow;'
-    else:
-        color_real = 'background-color: red;'
-        color_presupuesto = 'background-color: red;'
-else:
-    color_real = 'background-color: grey;'
-    color_presupuesto = 'background-color: grey;'
-
-# Mostrar los widgets alineados horizontalmente
-col1, col2 = st.columns(2)
-
-col1.markdown(f"<div style='{color_real} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado real<br><strong>${gasto_acumulado_real:.1f}M</strong></div>", unsafe_allow_html=True)
-if gasto_acumulado_presupuestado is not None:
-    col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>${gasto_acumulado_presupuestado:.1f}M</strong></div>", unsafe_allow_html=True)
-else:
-    col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>No disponible</strong></div>", unsafe_allow_html=True)
 
 # Gauge para mostrar consumo del presupuesto
 # Calcular el presupuesto anual total basado en los filtros aplicados
