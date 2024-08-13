@@ -404,6 +404,7 @@ else:
 
 # Texto dinamico con recomendaciones
 # Paso 1: Calcular el presupuesto disponible
+st.write("")
 st.markdown("#### Algunas Proyecciones...")
 presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
 gasto_acumulado_real = gasto_real['Valor/mon.inf.'].sum()
@@ -454,6 +455,8 @@ if proyeccion_final > 0:
 else:
     st.markdown(f"Si el gasto medio mensual se mantiene, **terminarás el año con un déficit de ${-proyeccion_final:.1f}M** en el presupuesto.")
 
+st.markdown("---")
+
 # Gauge para mostrar consumo del presupuesto
 # Calcular el presupuesto anual total basado en los filtros aplicados
 st.markdown("#### Que % del presupuesto hemos gastado?")
@@ -480,13 +483,16 @@ fig = go.Figure(go.Indicator(
             'value': 100
         }
     },
-    title={'text': "Porcentaje del Presupuesto Anual Consumido"}
+    title={'text': ""}
 ))
 
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig)
 
+st.markdown("---")
+
 # TABLA GASTO REAL VS PRESUPUESTADO
+st.markdown("### Veamos un poco mas de detalle...")
 st.markdown("#### Tabla de Gasto Real vs Presupuestado")
 
 # Crear la tabla combinada
@@ -560,7 +566,7 @@ fig.update_layout(
         zerolinecolor='black'
     ),
     xaxis_title='Mes y Año',
-    title='Análisis de Diferencia entre Gasto Real y Presupuesto',
+    title='Diferencia mensual entre Gasto Real y Presupuesto',
     barmode='overlay',
     xaxis=dict(
         tickmode='array',
