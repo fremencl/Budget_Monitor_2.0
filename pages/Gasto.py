@@ -345,6 +345,22 @@ col1, col2 = st.columns(2)
 col1.plotly_chart(fig_materiales)
 col2.plotly_chart(fig_servicios)
 
+# Calculos previos tabla y widget
+# Calcular las sumas por año y mes para Gasto Real usando filtered_data
+gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
+gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
+
+# Calcular las sumas por año y mes para Gasto Presupuestado usando budget_data_filtered
+gasto_presupuestado = budget_data_filtered.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
+gasto_presupuestado['Presupuesto'] = gasto_presupuestado['Presupuesto'].round(1)
+
+# Asegurarse de que las columnas son del mismo tipo
+gasto_real['Año'] = gasto_real['Año'].astype(str)
+gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para orden correcto
+gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
+gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
+
 # Nueva sección: Widgets de Gasto Acumulado (MOVER AQUI)
 st.markdown("#### Gasto Acumulado")
 
@@ -386,21 +402,6 @@ else:
 
 # TABLA GASTO REAL VS PRESUPUESTADO
 st.markdown("#### Tabla de Gasto Real vs Presupuestado")
-
-# Calcular las sumas por año y mes para Gasto Real usando filtered_data
-gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
-gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
-gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
-
-# Calcular las sumas por año y mes para Gasto Presupuestado usando budget_data_filtered
-gasto_presupuestado = budget_data_filtered.groupby(['Año', 'Mes'])['Presupuesto'].sum().reset_index()
-gasto_presupuestado['Presupuesto'] = gasto_presupuestado['Presupuesto'].round(1)
-
-# Asegurarse de que las columnas son del mismo tipo
-gasto_real['Año'] = gasto_real['Año'].astype(str)
-gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para orden correcto
-gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
-gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
 
 # Crear la tabla combinada
 combined_data = pd.merge(gasto_real, gasto_presupuestado, on=['Año', 'Mes'], how='outer').fillna(0)
