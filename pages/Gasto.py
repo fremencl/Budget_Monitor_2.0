@@ -445,8 +445,8 @@ fig = go.Figure(go.Indicator(
         'axis': {'range': [0, 100]},
         'bar': {'color': "green"},
         'steps': [
-            {'range': [0, 61], 'color': "lightgreen"},
-            {'range': [61, 100], 'color': "yellow"},
+            {'range': [0, 58], 'color': "lightgreen"},
+            {'range': [58, 100], 'color': "yellow"},
         ],
         'threshold': {
             'line': {'color': "red", 'width': 4},
