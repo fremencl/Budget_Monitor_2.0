@@ -467,15 +467,12 @@ ultimo_mes_real = combined_data[combined_data['Valor/mon.inf.'] > 0]['Mes'].max(
 # Crear una copia del DataFrame filtrado para los meses con datos reales
 combined_data_filtered = combined_data[combined_data['Mes'] <= ultimo_mes_real].copy()
 
-# Asegurar que todos los meses (hasta diciembre) están presentes en el eje X
-todos_los_meses = pd.DataFrame({'Mes': range(1, 13), 'Año': '2024'})
+# Asegurar que todos los meses hasta julio (o hasta el último mes con datos reales) están presentes en el eje X
+todos_los_meses = pd.DataFrame({'Mes': range(1, ultimo_mes_real + 1), 'Año': '2024'})
 combined_data_filtered = pd.merge(todos_los_meses, combined_data_filtered, on=['Año', 'Mes'], how='left').fillna(0)
 
-# Calcular el diferencial acumulado solo para los meses con datos reales
-diferencial_acumulado = combined_data_filtered['Diferencia'].cumsum()
-
-# Asegurar que la línea de gasto acumulado comienza desde cero y avanza correctamente
-combined_data_filtered['Diferencial Acumulado'] = [0] + diferencial_acumulado[:-1].tolist()
+# Calcular el diferencial acumulado correctamente sin incluir un periodo adicional
+combined_data_filtered['Diferencial Acumulado'] = combined_data_filtered['Diferencia'].cumsum()
 
 # Crear la gráfica de barras para la diferencia real vs presupuestado
 fig = go.Figure()
@@ -488,7 +485,7 @@ fig.add_trace(go.Bar(
     marker_color='blue'
 ))
 
-# Línea para el diferencial acumulado
+# Línea para el diferencial acumulado, sin desfasar
 fig.add_trace(go.Scatter(
     x=combined_data_filtered['Mes_Año'],
     y=combined_data_filtered['Diferencial Acumulado'],
@@ -511,7 +508,7 @@ fig.update_layout(
     barmode='overlay',
     xaxis=dict(
         tickmode='array',
-        tickvals=[f'{i}_2024' for i in range(1, 13)],  # Asegurar que todos los meses del año se muestran
+        tickvals=[f'{i}_2024' for i in range(1, 13)],  # Mostrar todos los meses del año
         ticktext=['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
     )
 )
