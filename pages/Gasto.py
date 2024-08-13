@@ -460,10 +460,12 @@ fig = go.Figure(go.Indicator(
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig)
 
-# Herramienta de analisis diferencial
+# Herramienta de análisis diferencial
 # Filtrar los datos solo hasta el último mes disponible con datos reales
-ultimo_mes_real = combined_data[combined_data['Diferencia'] != 0]['Mes'].max()
-combined_data_filtered = combined_data[combined_data['Mes'] <= ultimo_mes_real]
+ultimo_mes_real = combined_data[combined_data['Valor/mon.inf.'] > 0]['Mes'].max()
+
+# Crear una copia del DataFrame filtrado para los meses con datos reales
+combined_data_filtered = combined_data[combined_data['Mes'] <= ultimo_mes_real].copy()
 
 # Calcular el diferencial acumulado
 combined_data_filtered['Diferencial Acumulado'] = combined_data_filtered['Diferencia'].cumsum()
@@ -499,7 +501,12 @@ fig.update_layout(
     ),
     xaxis_title='Mes y Año',
     title='Análisis de Diferencia entre Gasto Real y Presupuesto',
-    barmode='overlay'
+    barmode='overlay',
+    xaxis=dict(
+        tickmode='array',
+        tickvals=[f'{i}_2024' for i in range(1, 13)],  # Mostrar todos los meses del año
+        ticktext=['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+    )
 )
 
 # Mostrar el gráfico en Streamlit
