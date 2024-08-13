@@ -362,7 +362,7 @@ gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
 gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
 
 # Nueva sección: Widgets de Gasto Acumulado
-st.markdown("#### Gasto Acumulado")
+st.markdown("#### Hasta el momento llevamos...")
 
 # Calcular el gasto acumulado real
 ultimo_mes_real = gasto_real['Mes'].max()
