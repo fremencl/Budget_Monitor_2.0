@@ -467,15 +467,15 @@ ultimo_mes_real = combined_data[combined_data['Valor/mon.inf.'] > 0]['Mes'].max(
 # Crear una copia del DataFrame filtrado para los meses con datos reales
 combined_data_filtered = combined_data[combined_data['Mes'] <= ultimo_mes_real].copy()
 
-# Agregar los meses faltantes hasta diciembre en 'combined_data_filtered' para asegurar que se muestren en el eje X
+# Asegurar que todos los meses (hasta diciembre) están presentes en el eje X
 todos_los_meses = pd.DataFrame({'Mes': range(1, 13), 'Año': '2024'})
 combined_data_filtered = pd.merge(todos_los_meses, combined_data_filtered, on=['Año', 'Mes'], how='left').fillna(0)
 
-# Asegurarse de que la columna 'Mes_Año' está en el formato correcto después de agregar los meses faltantes
-combined_data_filtered['Mes_Año'] = combined_data_filtered['Mes'].astype(str) + '_2024'
+# Calcular el diferencial acumulado solo para los meses con datos reales
+diferencial_acumulado = combined_data_filtered['Diferencia'].cumsum()
 
-# Calcular el diferencial acumulado desde cero y agregar un valor inicial de cero
-diferencial_acumulado = [0] + combined_data_filtered['Diferencia'].cumsum().tolist()
+# Asegurar que la línea de gasto acumulado comienza desde cero y avanza correctamente
+combined_data_filtered['Diferencial Acumulado'] = [0] + diferencial_acumulado[:-1].tolist()
 
 # Crear la gráfica de barras para la diferencia real vs presupuestado
 fig = go.Figure()
@@ -490,8 +490,8 @@ fig.add_trace(go.Bar(
 
 # Línea para el diferencial acumulado
 fig.add_trace(go.Scatter(
-    x=['0_2024'] + combined_data_filtered['Mes_Año'].tolist(),  # Iniciar desde el origen
-    y=diferencial_acumulado,
+    x=combined_data_filtered['Mes_Año'],
+    y=combined_data_filtered['Diferencial Acumulado'],
     mode='lines+markers',
     name='Diferencial Acumulado',
     line=dict(color='red'),
@@ -511,10 +511,4 @@ fig.update_layout(
     barmode='overlay',
     xaxis=dict(
         tickmode='array',
-        tickvals=[f'{i}_2024' for i in range(1, 13)],  # Asegurar que todos los meses del año se muestran
-        ticktext=['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    )
-)
-
-# Mostrar el gráfico en Streamlit
-st.plotly_chart(fig)
+        tickvals=[f'{i}_2024' for i in
