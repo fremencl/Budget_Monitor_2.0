@@ -467,6 +467,10 @@ ultimo_mes_real = combined_data[combined_data['Valor/mon.inf.'] > 0]['Mes'].max(
 # Crear una copia del DataFrame filtrado para los meses con datos reales
 combined_data_filtered = combined_data[combined_data['Mes'] <= ultimo_mes_real].copy()
 
+# Agregar los meses faltantes hasta diciembre en 'combined_data_filtered' para asegurar que se muestren en el eje X
+todos_los_meses = pd.DataFrame({'Mes': range(1, 13), 'Año': '2024'})
+combined_data_filtered = pd.merge(todos_los_meses, combined_data_filtered, on=['Año', 'Mes'], how='left').fillna(0)
+
 # Calcular el diferencial acumulado
 combined_data_filtered['Diferencial Acumulado'] = combined_data_filtered['Diferencia'].cumsum()
 
@@ -484,7 +488,7 @@ fig.add_trace(go.Bar(
 # Línea para el diferencial acumulado
 fig.add_trace(go.Scatter(
     x=combined_data_filtered['Mes_Año'],
-    y=combined_data_filtered['Diferencial Acumulado'],
+    y=[0] + combined_data_filtered['Diferencial Acumulado'].tolist(),  # Incluir 0 al inicio
     mode='lines+markers',
     name='Diferencial Acumulado',
     line=dict(color='red'),
