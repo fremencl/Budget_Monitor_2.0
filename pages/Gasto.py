@@ -236,131 +236,114 @@ data0 = combined_data
 data0['Proceso'] = data0['Proceso'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
 
-# Calcular las sumas por año y mes para Gasto Real usando filtered_data
-gasto_real = filtered_data.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
-gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
-gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
+# Paso 1: Calcular el gasto total mensual por proceso, excluyendo "Overhead"
+gasto_mensual_proceso = data0[data0['Proceso'] != 'Overhead'].groupby(['Ejercicio', 'Período', 'Proceso'])['Valor/mon.inf.'].sum().reset_index()
 
-# Nueva sección: Widgets de Gasto Acumulado
-st.markdown("#### Gasto Acumulado")
+# Paso 2: Calcular el gasto total mensual excluyendo "Overhead"
+gasto_mensual_total_sin_overhead = gasto_mensual_proceso.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+gasto_mensual_total_sin_overhead = gasto_mensual_total_sin_overhead.rename(columns={'Valor/mon.inf.': 'Total_sin_overhead'})
 
-# Calcular el gasto acumulado real
-ultimo_mes_real = gasto_real['Mes'].max()
-gasto_acumulado_real = gasto_real[gasto_real['Mes'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
+# Paso 3: Calcular las proporciones de cada proceso con respecto al gasto total mensual excluyendo "Overhead"
+gasto_mensual_proceso = gasto_mensual_proceso.merge(gasto_mensual_total_sin_overhead, on=['Ejercicio', 'Período'])
+gasto_mensual_proceso['Proporción'] = gasto_mensual_proceso['Valor/mon.inf.'] / gasto_mensual_proceso['Total_sin_overhead']
 
-# Verificar si hay datos presupuestados antes de calcular el gasto acumulado presupuestado
-if not gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real].empty:
-    gasto_acumulado_presupuestado = gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real]['Presupuesto'].sum()
-else:
-    gasto_acumulado_presupuestado = None
+# Paso 4: Filtrar solo los datos de "Overhead"
+gasto_overhead = data0[data0['Proceso'] == 'Overhead'].groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
 
-# Aplicar lógica de colores
-if gasto_acumulado_presupuestado is not None and gasto_acumulado_presupuestado != 0:
-    diferencia_porcentaje = (gasto_acumulado_real / gasto_acumulado_presupuestado) * 100
+# Paso 5: Crear nuevas filas para cada proceso con el monto redistribuido de "Overhead"
+filas_nuevas = []
 
-    if diferencia_porcentaje <= 100:
-        color_real = 'background-color: green;'
-        color_presupuesto = 'background-color: green;'
-    elif 100 < diferencia_porcentaje <= 110:
-        color_real = 'background-color: yellow;'
-        color_presupuesto = 'background-color: yellow;'
-    else:
-        color_real = 'background-color: red;'
-        color_presupuesto = 'background-color: red;'
-else:
-    color_real = 'background-color: grey;'
-    color_presupuesto = 'background-color: grey;'
-
-# Mostrar los widgets alineados horizontalmente
-col1, col2 = st.columns(2)
-
-col1.markdown(f"<div style='{color_real} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado real<br><strong>${gasto_acumulado_real:.1f}M</strong></div>", unsafe_allow_html=True)
-if gasto_acumulado_presupuestado is not None:
-    col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>${gasto_acumulado_presupuestado:.1f}M</strong></div>", unsafe_allow_html=True)
-else:
-    col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>No disponible</strong></div>", unsafe_allow_html=True)
-
-# Texto dinámico con recomendaciones
-# Paso 1: Calcular el presupuesto disponible
-presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
-gasto_acumulado_real = gasto_real['Valor/mon.inf.'].sum()
-presupuesto_disponible = presupuesto_anual_total - gasto_acumulado_real
-
-# Paso 2: Calcular el gasto medio de los periodos con gasto real
-gasto_medio = gasto_acumulado_real / len(gasto_real)  # len(gasto_real) nos da el número de meses con gasto real
-
-# Paso 3: Calcular la proyección de fin de año
-meses_restantes = 12 - len(gasto_real)
-proyeccion_final = presupuesto_disponible - (gasto_medio * meses_restantes)
-
-# Definir el presupuesto medio mensual
-presupuesto_medio_mensual = 767  # En millones de pesos
-
-# Paso 4: Mostrar los widgets con la nueva lógica de colores
-col1, col2, col3 = st.columns(3)
-
-# Presupuesto disponible - siempre verde
-col1.markdown(f"<div style='background-color:green; padding: 10px; border-radius: 5px; text-align: center;'>"
-              f"<strong>Presupuesto Disponible</strong><br>${presupuesto_disponible:.1f}M</div>", unsafe_allow_html=True)
-
-# Gasto medio mensual con lógica de colores
-if abs(gasto_medio - presupuesto_medio_mensual) <= presupuesto_medio_mensual * 0.05:
-    color_gasto_medio = 'green'
-elif abs(gasto_medio - presupuesto_medio_mensual) <= presupuesto_medio_mensual * 0.10:
-    color_gasto_medio = 'yellow'
-else:
-    color_gasto_medio = 'red'
-
-col2.markdown(f"<div style='background-color:{color_gasto_medio}; padding: 10px; border-radius: 5px; text-align: center;'>"
-              f"<strong>Gasto Medio Mensual</strong><br>${gasto_medio:.1f}M</div>", unsafe_allow_html=True)
-
-# Proyección de fin de año con lógica de colores basada en el presupuesto anual
-if abs(proyeccion_final) <= presupuesto_anual_total * 0.05:
-    color_proyeccion_final = 'green'
-elif abs(proyeccion_final) <= presupuesto_anual_total * 0.10:
-    color_proyeccion_final = 'yellow'
-else:
-    color_proyeccion_final = 'red'
-
-col3.markdown(f"<div style='background-color:{color_proyeccion_final}; padding: 10px; border-radius: 5px; text-align: center;'>"
-              f"<strong>Proyección a Fin de Año</strong><br>${proyeccion_final:.1f}M</div>", unsafe_allow_html=True)
-
-# Paso 5: Mostrar el texto dinámico
-if proyeccion_final > 0:
-    st.markdown(f"Si el gasto medio mensual se mantiene, **terminarás el año con un excedente de ${proyeccion_final:.1f}M** en el presupuesto.")
-else:
-    st.markdown(f"Si el gasto medio mensual se mantiene, **terminarás el año con un déficit de ${-proyeccion_final:.1f}M** en el presupuesto.")
-
-# Gauge para mostrar consumo del presupuesto
-# Calcular el presupuesto anual total basado en los filtros aplicados
-presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
-
-# Calcular el porcentaje del presupuesto gastado
-porcentaje_gastado = (gasto_acumulado_real / presupuesto_anual_total) * 100 if presupuesto_anual_total > 0 else 0
-
-# Crear gráfico de indicador (gauge)
-fig = go.Figure(go.Indicator(
-    mode="gauge+number",  # Eliminar 'delta' para ocultar el valor diferencial
-    value=porcentaje_gastado,
-    number={'suffix': "%"},  # Agregar el signo de porcentaje al valor
-    gauge={
-        'axis': {'range': [0, 100]},
-        'bar': {'color': "green"},
-        'steps': [
-            {'range': [0, 58], 'color': "lightgreen"},
-            {'range': [58, 100], 'color': "yellow"},
-        ],
-        'threshold': {
-            'line': {'color': "red", 'width': 4},
-            'thickness': 0.75,
-            'value': 100
+for _, overhead_row in gasto_overhead.iterrows():
+    ejercicio = overhead_row['Ejercicio']
+    periodo = overhead_row['Período']
+    overhead_valor = overhead_row['Valor/mon.inf.']
+    
+    # Obtener las proporciones de los otros procesos en el mismo período
+    proporciones_procesos = gasto_mensual_proceso[(gasto_mensual_proceso['Ejercicio'] == ejercicio) & 
+                                                  (gasto_mensual_proceso['Período'] == periodo)]
+    
+    for _, proc_row in proporciones_procesos.iterrows():
+        # 50% a Materiales
+        nueva_fila_materiales = {
+            'Ejercicio': ejercicio,
+            'Período': periodo,
+            'Proceso': proc_row['Proceso'],
+            'Valor/mon.inf.': overhead_valor * proc_row['Proporción'] * 0.5,
+            'Familia_Cuenta': 'Materiales'
         }
-    },
-    title={'text': "Porcentaje del Presupuesto Anual Gastado"}
-))
+        filas_nuevas.append(nueva_fila_materiales)
+        
+        # 50% a Servicios
+        nueva_fila_servicios = {
+            'Ejercicio': ejercicio,
+            'Período': periodo,
+            'Proceso': proc_row['Proceso'],
+            'Valor/mon.inf.': overhead_valor * proc_row['Proporción'] * 0.5,
+            'Familia_Cuenta': 'Servicios'
+        }
+        filas_nuevas.append(nueva_fila_servicios)
 
-# Mostrar el gráfico en Streamlit
-st.plotly_chart(fig)
+# Convertir la lista de nuevas filas a un DataFrame
+filas_nuevas_df = pd.DataFrame(filas_nuevas)
+
+# Paso 6: Agregar las nuevas filas al DataFrame original
+data0 = pd.concat([data0, filas_nuevas_df], ignore_index=True)
+
+# Paso 7: Eliminar las filas correspondientes a "Overhead"
+data0 = data0[data0['Proceso'] != 'Overhead']
+
+# Ajuste: Convertir 'Ejercicio' y 'Período' a string nuevamente
+data0['Ejercicio'] = data0['Ejercicio'].astype(str)
+data0['Período'] = data0['Período'].astype(str)
+
+# Convertir la columna 'Familia_Cuenta' y 'Recinto' a tipo string
+data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
+data0['Recinto'] = data0['Recinto'].astype(str)
+
+# FILTROS en la barra lateral
+st.sidebar.markdown("### Filtros")
+selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio'].unique().tolist(), default=['2024'])
+selected_procesos = st.sidebar.multiselect("Selecciona el proceso", data0['Proceso'].unique().tolist(), default=data0['Proceso'].unique().tolist())
+selected_familias = st.sidebar.multiselect("Selecciona la Familia_Cuenta", ['Materiales', 'Servicios'], default=['Materiales', 'Servicios'])
+
+# Verificar si todos los procesos están seleccionados
+all_processes_selected = set(selected_procesos) == set(data0['Proceso'].unique().tolist())
+
+# Aplicar los filtros después de calcular las sumatorias
+filtered_data = data0[
+    (data0['Ejercicio'].isin(selected_years)) & 
+    (data0['Proceso'].isin(selected_procesos)) & 
+    (data0['Familia_Cuenta'].isin(selected_familias)) &
+    (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
+]
+
+# Aplicar los mismos filtros a budget_data
+budget_data_filtered = budget_data[
+    (budget_data['Año'].isin(selected_years)) & 
+    (budget_data['Proceso'].isin(selected_procesos)) & 
+    (budget_data['Familia_Cuenta'].isin(selected_familias))
+]
+
+# Si todos los procesos están seleccionados, incluir presupuesto overhead
+if all_processes_selected:
+    budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
+    budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
+
+# GRÁFICO DE TORTA
+st.markdown("### Distribución del Gasto")
+
+# Grafico de torta para materiales
+gasto_materiales = filtered_data[filtered_data['Familia_Cuenta'] == 'Materiales'].groupby('Proceso')['Valor/mon.inf.'].sum().reset_index()
+fig_materiales = px.pie(gasto_materiales, values='Valor/mon.inf.', names='Proceso', title='Distribución del Gasto en Materiales')
+
+# Grafico de torta para servicios
+gasto_servicios = filtered_data[filtered_data['Familia_Cuenta'] == 'Servicios'].groupby('Proceso')['Valor/mon.inf.'].sum().reset_index()
+fig_servicios = px.pie(gasto_servicios, values='Valor/mon.inf.', names='Proceso', title='Distribución del Gasto en Servicios')
+
+# Mostrar gráficos en columnas
+col1, col2 = st.columns(2)
+col1.plotly_chart(fig_materiales)
+col2.plotly_chart(fig_servicios)
 
 # TABLA GASTO REAL VS PRESUPUESTADO
 st.markdown("#### Tabla de Gasto Real vs Presupuestado")
@@ -406,6 +389,76 @@ combined_data_transposed = combined_data_display.T
 
 # Mostrar la tabla transpuesta en Streamlit
 st.dataframe(combined_data_transposed)
+
+# Nueva sección: Widgets de Gasto Acumulado
+st.markdown("#### Gasto Acumulado")
+
+# Calcular el gasto acumulado real
+ultimo_mes_real = gasto_real['Mes'].max()
+gasto_acumulado_real = gasto_real[gasto_real['Mes'] <= ultimo_mes_real]['Valor/mon.inf.'].sum()
+
+# Verificar si hay datos presupuestados antes de calcular el gasto acumulado presupuestado
+if not gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real].empty:
+    gasto_acumulado_presupuestado = gasto_presupuestado[gasto_presupuestado['Mes'] <= ultimo_mes_real]['Presupuesto'].sum()
+else:
+    gasto_acumulado_presupuestado = None
+
+# Aplicar lógica de colores
+if gasto_acumulado_presupuestado is not None and gasto_acumulado_presupuestado != 0:
+    diferencia_porcentaje = (gasto_acumulado_real / gasto_acumulado_presupuestado) * 100
+
+    if diferencia_porcentaje <= 100:
+        color_real = 'background-color: green;'
+        color_presupuesto = 'background-color: green;'
+    elif 100 < diferencia_porcentaje <= 110:
+        color_real = 'background-color: yellow;'
+        color_presupuesto = 'background-color: yellow;'
+    else:
+        color_real = 'background-color: red;'
+        color_presupuesto = 'background-color: red;'
+else:
+    color_real = 'background-color: grey;'
+    color_presupuesto = 'background-color: grey;'
+
+# Mostrar los widgets alineados horizontalmente
+col1, col2 = st.columns(2)
+
+col1.markdown(f"<div style='{color_real} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado real<br><strong>${gasto_acumulado_real:.1f}M</strong></div>", unsafe_allow_html=True)
+if gasto_acumulado_presupuestado is not None:
+    col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>${gasto_acumulado_presupuestado:.1f}M</strong></div>", unsafe_allow_html=True)
+else:
+    col2.markdown(f"<div style='{color_presupuesto} padding: 10px; border-radius: 5px; text-align: center;'>Gasto acumulado presupuestado<br><strong>No disponible</strong></div>", unsafe_allow_html=True)
+
+# Gauge para mostrar consumo del presupuesto
+# Calcular el presupuesto anual total basado en los filtros aplicados
+presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
+
+# Calcular el porcentaje del presupuesto gastado
+porcentaje_gastado = (gasto_acumulado_real / presupuesto_anual_total) * 100 if presupuesto_anual_total > 0 else 0
+
+# Crear gráfico de indicador (gauge)
+fig = go.Figure(go.Indicator(
+    mode="gauge+number",  # Eliminar 'delta' para ocultar el valor diferencial
+    value=porcentaje_gastado,
+    number={'suffix': "%"},  # Agregar el signo de porcentaje al valor
+    gauge={
+        'axis': {'range': [0, 100]},
+        'bar': {'color': "green"},
+        'steps': [
+            {'range': [0, 58], 'color': "lightgreen"},
+            {'range': [58, 100], 'color': "yellow"},
+        ],
+        'threshold': {
+            'line': {'color': "red", 'width': 4},
+            'thickness': 0.75,
+            'value': 100
+        }
+    },
+    title={'text': "Porcentaje del Presupuesto Anual Gastado"}
+))
+
+# Mostrar el gráfico en Streamlit
+st.plotly_chart(fig)
 
 # Herramienta de análisis diferencial
 # Filtrar los datos solo hasta el último mes disponible con datos reales
@@ -462,3 +515,54 @@ fig.update_layout(
 
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig)
+
+# Texto dinamico con recomendaciones
+# Paso 1: Calcular el presupuesto disponible
+presupuesto_anual_total = budget_data_filtered['Presupuesto'].sum()
+gasto_acumulado_real = gasto_real['Valor/mon.inf.'].sum()
+presupuesto_disponible = presupuesto_anual_total - gasto_acumulado_real
+
+# Paso 2: Calcular el gasto medio de los periodos con gasto real
+gasto_medio = gasto_acumulado_real / len(gasto_real)  # len(gasto_real) nos da el número de meses con gasto real
+
+# Paso 3: Calcular la proyección de fin de año
+meses_restantes = 12 - len(gasto_real)
+proyeccion_final = presupuesto_disponible - (gasto_medio * meses_restantes)
+
+# Definir el presupuesto medio mensual
+presupuesto_medio_mensual = 767  # En millones de pesos
+
+# Paso 4: Mostrar los widgets con la nueva lógica de colores
+col1, col2, col3 = st.columns(3)
+
+# Presupuesto disponible - siempre verde
+col1.markdown(f"<div style='background-color:green; padding: 10px; border-radius: 5px; text-align: center;'>"
+              f"<strong>Presupuesto Disponible</strong><br>${presupuesto_disponible:.1f}M</div>", unsafe_allow_html=True)
+
+# Gasto medio mensual con lógica de colores
+if abs(gasto_medio - presupuesto_medio_mensual) <= presupuesto_medio_mensual * 0.05:
+    color_gasto_medio = 'green'
+elif abs(gasto_medio - presupuesto_medio_mensual) <= presupuesto_medio_mensual * 0.10:
+    color_gasto_medio = 'yellow'
+else:
+    color_gasto_medio = 'red'
+
+col2.markdown(f"<div style='background-color:{color_gasto_medio}; padding: 10px; border-radius: 5px; text-align: center;'>"
+              f"<strong>Gasto Medio Mensual</strong><br>${gasto_medio:.1f}M</div>", unsafe_allow_html=True)
+
+# Proyección de fin de año con lógica de colores basada en el presupuesto anual
+if abs(proyeccion_final) <= presupuesto_anual_total * 0.05:
+    color_proyeccion_final = 'green'
+elif abs(proyeccion_final) <= presupuesto_anual_total * 0.10:
+    color_proyeccion_final = 'yellow'
+else:
+    color_proyeccion_final = 'red'
+
+col3.markdown(f"<div style='background-color:{color_proyeccion_final}; padding: 10px; border-radius: 5px; text-align: center;'>"
+              f"<strong>Proyección a Fin de Año</strong><br>${proyeccion_final:.1f}M</div>", unsafe_allow_html=True)
+
+# Paso 5: Mostrar el texto dinámico
+if proyeccion_final > 0:
+    st.markdown(f"Si el gasto medio mensual se mantiene, **terminarás el año con un excedente de ${proyeccion_final:.1f}M** en el presupuesto.")
+else:
+    st.markdown(f"Si el gasto medio mensual se mantiene, **terminarás el año con un déficit de ${-proyeccion_final:.1f}M** en el presupuesto.")
