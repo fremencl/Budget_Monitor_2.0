@@ -356,11 +356,21 @@ st.download_button(
     file_name='filas_data0_filtered.csv',
     mime='text/csv',
 )
+
 # Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
 data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
                                       how='left', 
                                       left_on='Orden partner', 
-                                      right_on='Orden')
+                                      right_on='Orden', 
+                                      suffixes=('_original', '_merged'))
+
+# Luego del merge, selecciona y renombra las columnas necesarias
+if 'Clase de orden_merged' in data0_filtered.columns:
+    data0_filtered['Clase de orden'] = data0_filtered['Clase de orden_merged']
+    # Elimina las columnas no necesarias después del merge
+    data0_filtered.drop(columns=['Orden_original', 'Clase de orden_merged', 'Orden_merged'], inplace=True)
+else:
+    st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
 
 # Verificar si el mapeo fue exitoso
 if data0_filtered['Clase de orden'].isna().all():
