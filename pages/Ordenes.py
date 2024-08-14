@@ -348,8 +348,8 @@ data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']],
 data0_filtered['Valor/mon.inf.'] = (data0_filtered['Valor/mon.inf.'] / 1000000).round(1)
 
 # Preparar los datos para el gráfico de columnas apiladas
-data0['Mes'] = data0['Período'].astype(int)
-data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
+data0_filtered['Mes'] = data0_filtered['Período'].astype(int)
+data0_grouped = data0_filtered.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
 # Crear la gráfica de barras apiladas
