@@ -343,24 +343,6 @@ gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
 gasto_real['Año'] = gasto_real['Año'].astype(str)
 gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para orden correcto
 
-# Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
-    
-# Generar el enlace de descarga para las filas procesadas
-csv_gasto_real = convertir_a_csv(gasto_real)
-
-# Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_gasto_real",
-    data=csv_gasto_real,
-    file_name='filas_gasto_real.csv',
-    mime='text/csv',
-)
-
 # Gráfico de Columnas Apiladas con Presupuesto
 st.markdown("### Gráfico de Gasto Real por Tipo de Orden y Presupuesto")
 
@@ -388,6 +370,24 @@ tipo_orden_metrics_display['Valor OT media'] = tipo_orden_metrics_display['Valor
 data0['Mes'] = data0['Período'].astype(int)
 data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
+
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+    
+# Generar el enlace de descarga para las filas procesadas
+csv_data0_pivot = convertir_a_csv(data0_pivot)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_data0_pivot",
+    data=csv_data0_pivot,
+    file_name='filas_data0_pivot.csv',
+    mime='text/csv',
+)
 
 # Agregar la columna de presupuesto y multiplicar por 1,000,000
 #data0_pivot['Presupuesto'] = combined_data.set_index('Mes')['Presupuesto'] * 1000000
