@@ -300,24 +300,6 @@ data0['Recinto'] = data0['Recinto'].astype(str)
 # Asegurarse de que los valores en 'Valor/mon.inf.' sean enteros
 data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].astype(int)
 
-# Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
-
-# Generar el enlace de descarga para las filas procesadas
-csv_data0 = convertir_a_csv(data0)
-
-# Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_data0",
-    data=csv_data0,
-    file_name='filas_data0.csv',
-    mime='text/csv',
-)
-
 # FILTROS en la barra lateral
 st.sidebar.markdown("### Filtros")
 selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio'].unique().tolist(), default=['2024'])
@@ -332,6 +314,23 @@ filtered_data = data0[
     (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
 ]
 
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+
+# Generar el enlace de descarga para las filas procesadas
+csv_filtered_data = convertir_a_csv(filtered_data)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_filtered_data",
+    data=csv_filtered_data,
+    file_name='filtered_data.csv',
+    mime='text/csv',
+)
 # Redondear valores y asegurarse de que sean enteros
 filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
