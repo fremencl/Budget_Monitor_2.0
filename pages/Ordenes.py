@@ -351,13 +351,6 @@ orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden
 # Mapear "Clase de orden" usando el diccionario
 filtered_utec['Clase de orden'] = filtered_utec['Orden partner'].map(orden_to_clase_dict)
 
-# Verificar si el mapeo fue exitoso
-if filtered_utec['Clase de orden'].isna().all():
-    st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
-else:
-    st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
-    st.write(filtered_data0[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
-
 # Verificar que la columna "Valor/mon.inf." esté en millones
 filtered_utec['Valor/mon.inf.'] = (filtered_utec['Valor/mon.inf.'] / 1000000).round(1)
 
