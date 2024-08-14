@@ -328,6 +328,17 @@ if all_processes_selected:
     budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
     budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
 
+# Calcular las sumas por año y mes para Gasto Real
+gasto_real = data0.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
+gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
+
+# Asegurarse de que las columnas son del mismo tipo
+gasto_real['Año'] = gasto_real['Año'].astype(str)
+gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para orden correcto
+gasto_presupuestado['Año'] = gasto_presupuestado['Año'].astype(str)
+gasto_presupuestado['Mes'] = gasto_presupuestado['Mes'].astype(int)  # Convertir a entero para orden correcto
+
 # Gráfico de Columnas Apiladas con Presupuesto
 st.markdown("### Gráfico de Gasto Real por Tipo de Orden y Presupuesto")
 
