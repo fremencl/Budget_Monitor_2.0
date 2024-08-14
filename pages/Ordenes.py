@@ -339,12 +339,6 @@ data0_filtered['Clase de orden'] = None
 data0_filtered['Orden partner'] = data0_filtered['Orden partner'].astype(str)
 orders_data['Orden'] = orders_data['Orden'].astype(str)
 
-# Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
-data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
-                                      how='left', 
-                                      left_on='Orden partner', 
-                                      right_on='Orden')
-
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
     buffer = io.StringIO()
@@ -362,6 +356,11 @@ st.download_button(
     file_name='filas_data0_filtered.csv',
     mime='text/csv',
 )
+# Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
+data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
+                                      how='left', 
+                                      left_on='Orden partner', 
+                                      right_on='Orden')
 
 # Verificar si el mapeo fue exitoso
 if data0_filtered['Clase de orden'].isna().all():
