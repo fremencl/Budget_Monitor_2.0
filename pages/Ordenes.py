@@ -299,6 +299,13 @@ data0['Período'] = data0['Período'].astype(str)
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
 
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+    
 # Generar el enlace de descarga para las filas procesadas
 csv_data0 = convertir_a_csv(data0)
 
