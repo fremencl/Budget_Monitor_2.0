@@ -318,7 +318,7 @@ filtered_data = data0[
 filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
 # Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
-filtered_data0 = filtered_data['Utec'].isna().copy()
+filtered_data = filtered_data['Utec'].isna().copy()
 
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
@@ -328,13 +328,13 @@ def convertir_a_csv(df):
     return buffer.getvalue()
 
 # Generar el enlace de descarga para las filas procesadas
-csv_filtered_data0 = convertir_a_csv(filtered_data0)
+csv_filtered_data = convertir_a_csv(filtered_data)
 
 # Agregar un botón de descarga en la aplicación
 st.download_button(
-    label="Descargar_filtered_data0",
-    data=csv_filtered_data0,
-    file_name='filtered_data0.csv',
+    label="Descargar_filtered_data",
+    data=csv_filtered_data,
+    file_name='filtered_data.csv',
     mime='text/csv',
 )
 
