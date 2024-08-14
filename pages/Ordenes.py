@@ -27,7 +27,7 @@ st.markdown(
 # Definimos las URLs de los archivos de referencia
 DATA0_URL = 'https://streamlitmaps.s3.amazonaws.com/Data_0724.csv'
 BUDGET_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Presupuesto_3.csv'
-ORDERS_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Ordenes_0724_3.csv'
+ORDERS_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Ordenes_0724.csv'
 BASE_UTEC_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_UTEC_BudgetVersion.csv'
 BASE_CECO_URL = 'https://streamlitmaps.s3.amazonaws.com/Base_Ceco_3.csv'
 
@@ -60,6 +60,8 @@ assert 'Recinto' in base_ceco_data.columns, "La columna 'Recinto' no está prese
 # Asegurarse de que 'Ejercicio' y 'Período' son de tipo string
 data0['Ejercicio'] = data0['Ejercicio'].astype(str)
 data0['Período'] = data0['Período'].astype(str)
+budget_data['Año'] = budget_data['Año'].astype(str)
+budget_data['Mes'] = budget_data['Mes'].astype(str)
 
 # Agregar nuevas columnas a data0
 data0['Utec'] = None
@@ -306,6 +308,9 @@ selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio']
 selected_procesos = st.sidebar.multiselect("Selecciona el proceso", data0['Proceso'].unique().tolist(), default=data0['Proceso'].unique().tolist())
 selected_familias = st.sidebar.multiselect("Selecciona la Familia_Cuenta", ['Materiales', 'Servicios'], default=['Materiales', 'Servicios'])
 
+# Verificar si todos los procesos están seleccionados
+#all_processes_selected = set(selected_procesos) == set(data0['Proceso'].unique().tolist())
+
 # Aplicar los filtros después de calcular las sumatorias
 filtered_data = data0[
     (data0['Ejercicio'].isin(selected_years)) & 
@@ -314,53 +319,37 @@ filtered_data = data0[
     (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
 ]
 
-# Redondear valores y asegurarse de que sean enteros
-filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
+# Aplicar los mismos filtros a budget_data
+budget_data_filtered = budget_data[
+    (budget_data['Año'].isin(selected_years)) & 
+    (budget_data['Proceso'].isin(selected_procesos)) & 
+    (budget_data['Familia_Cuenta'].isin(selected_familias))
+]
 
-# Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
-filtered_utec = filtered_data[~filtered_data['Utec'].isna()].copy()
+# Redondear valores y asegurarse de que sean enteros
+data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].round(0).astype(int)
+
+# Filtrar data0 excluyendo filas donde la columna Utec esté vacía
+data0_filtered = data0[~data0['Utec'].isna()].copy()
 
 # Agregar una nueva columna "Clase de orden" a data0_filtered
-filtered_utec['Clase de orden'] = None
+data0_filtered['Clase de orden'] = None
 
-# Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
-filtered_utec['Orden partner'] = filtered_utec['Orden partner'].astype(str)
-orders_data['Orden'] = orders_data['Orden'].astype(str)
+# Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
+data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
+                                      how='left', 
+                                      left_on='Orden partner', 
+                                      right_on='Orden')
 
-# Asegurarse de que la columna 'Clase de orden' sea del mismo tipo en ambos DataFrames
-filtered_utec['Clase de orden'] = filtered_utec['Clase de orden'].astype(str)
-orders_data['Clase de orden'] = orders_data['Clase de orden'].astype(str)
-
-# Crear un diccionario para el mapeo de 'Orden' a 'Clase de orden'
-orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden']))
-
-# Mapear "Clase de orden" usando el diccionario
-filtered_utec['Clase de orden'] = filtered_utec['Orden partner'].map(orden_to_clase_dict)
-
-# Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
-
-# Generar el enlace de descarga para las filas procesadas
-csv_orders_data = convertir_a_csv(orders_data)
-
-# Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_orders_data",
-    data=csv_orders_data,
-    file_name='orders_data.csv',
-    mime='text/csv',
-)
+# Eliminar la columna 'Orden' redundante después del merge
+#data0_filtered.drop(columns=['Orden'], inplace=True)
 
 # Verificar que la columna "Valor/mon.inf." esté en millones
-filtered_utec['Valor/mon.inf.'] = (filtered_utec['Valor/mon.inf.'] / 1000000).round(1)
+data0_filtered['Valor/mon.inf.'] = (data0_filtered['Valor/mon.inf.'] / 1000000).round(1)
 
 # Preparar los datos para el gráfico de columnas apiladas
-filtered_utec['Mes'] = filtered_utec['Período'].astype(int)
-data0_grouped = filtered_utec.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
+data0['Mes'] = data0['Período'].astype(int)
+data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
 # Crear la gráfica de barras apiladas
