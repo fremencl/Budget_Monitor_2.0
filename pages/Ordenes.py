@@ -106,6 +106,24 @@ if 'Utec' in data0.columns:
 # Convertir temporalmente 'Período' a tipo numérico para eliminar pares opuestos
 data0['Período'] = pd.to_numeric(data0['Período'], errors='coerce')
 
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+    
+# Generar el enlace de descarga para las filas procesadas
+csv_data0 = convertir_a_csv(data0)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_data0",
+    data=csv_data0,
+    file_name='filas_data0.csv',
+    mime='text/csv',
+)
+
 # Función para eliminar filas con valores específicos en "Grupo_Ceco"
 def eliminar_filas_grupo_ceco(data):
     valores_excluir = ["Abastecimiento y contratos", "Finanzas", "Servicios generales"]
@@ -370,24 +388,6 @@ tipo_orden_metrics_display['Valor OT media'] = tipo_orden_metrics_display['Valor
 data0['Mes'] = data0['Período'].astype(int)
 data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
-
-# Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
-    
-# Generar el enlace de descarga para las filas procesadas
-csv_data0_pivot = convertir_a_csv(data0_pivot)
-
-# Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_data0_pivot",
-    data=csv_data0_pivot,
-    file_name='filas_data0_pivot.csv',
-    mime='text/csv',
-)
 
 # Agregar la columna de presupuesto y multiplicar por 1,000,000
 #data0_pivot['Presupuesto'] = combined_data.set_index('Mes')['Presupuesto'] * 1000000
