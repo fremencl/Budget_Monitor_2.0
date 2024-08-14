@@ -328,3 +328,26 @@ if all_processes_selected:
     budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
     budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
 
+# Gráfico de Columnas Apiladas con Presupuesto
+st.markdown("### Gráfico de Gasto Real por Tipo de Orden y Presupuesto")
+
+# Preparar los datos para el gráfico de columnas apiladas
+data0['Mes'] = data0['Período'].astype(int)
+data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
+data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
+
+# Agregar la columna de presupuesto y multiplicar por 1,000,000
+data0_pivot['Presupuesto'] = combined_data.set_index('Mes')['Presupuesto'] * 1000000
+
+fig_columnas = go.Figure()
+
+# Añadir las columnas apiladas por tipo de orden
+for column in data0_pivot.columns:
+    if column != 'Presupuesto':
+        fig_columnas.add_trace(go.Bar(x=data0_pivot.index, y=data0_pivot[column], name=column))
+
+# Añadir la línea de presupuesto
+fig_columnas.add_trace(go.Scatter(x=data0_pivot.index, y=data0_pivot['Presupuesto'], mode='lines+markers', name='Presupuesto', line=dict(color='grey', width=2, dash='dash')))
+
+fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden vs Presupuesto', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
+st.plotly_chart(fig_columnas)
