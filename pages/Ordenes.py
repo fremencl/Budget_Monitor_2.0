@@ -342,28 +342,28 @@ st.download_button(
 )
 
 # Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
-filtered_data0['Orden partner'] = filtered_data0['Orden partner'].astype(str)
+filtered_utec['Orden partner'] = filtered_utec['Orden partner'].astype(str)
 orders_data['Orden'] = orders_data['Orden'].astype(str)
 
 # Crear un diccionario para el mapeo de 'Orden' a 'Clase de orden'
 orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden']))
 
 # Mapear "Clase de orden" usando el diccionario
-filtered_data0['Clase de orden'] = filtered_data0['Orden partner'].map(orden_to_clase_dict)
+filtered_utec['Clase de orden'] = filtered_utec['Orden partner'].map(orden_to_clase_dict)
 
 # Verificar si el mapeo fue exitoso
-if filtered_data0['Clase de orden'].isna().all():
+if filtered_utec['Clase de orden'].isna().all():
     st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
 else:
     st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
     st.write(filtered_data0[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
 
 # Verificar que la columna "Valor/mon.inf." esté en millones
-filtered_data0['Valor/mon.inf.'] = (filtered_data0['Valor/mon.inf.'] / 1000000).round(1)
+filtered_utec['Valor/mon.inf.'] = (filtered_utec['Valor/mon.inf.'] / 1000000).round(1)
 
 # Preparar los datos para el gráfico de columnas apiladas
-filtered_data0['Mes'] = filtered_data0['Período'].astype(int)
-data0_grouped = filtered_data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
+filtered_utec['Mes'] = filtered_utec['Período'].astype(int)
+data0_grouped = filtered_utec.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
 # Crear la gráfica de barras apiladas
