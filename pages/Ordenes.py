@@ -308,9 +308,6 @@ selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio']
 selected_procesos = st.sidebar.multiselect("Selecciona el proceso", data0['Proceso'].unique().tolist(), default=data0['Proceso'].unique().tolist())
 selected_familias = st.sidebar.multiselect("Selecciona la Familia_Cuenta", ['Materiales', 'Servicios'], default=['Materiales', 'Servicios'])
 
-# Verificar si todos los procesos están seleccionados
-#all_processes_selected = set(selected_procesos) == set(data0['Proceso'].unique().tolist())
-
 # Aplicar los filtros después de calcular las sumatorias
 filtered_data = data0[
     (data0['Ejercicio'].isin(selected_years)) & 
@@ -323,7 +320,7 @@ filtered_data = data0[
 filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
 # Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
-data0_filtered = filtered_data[~data0['Utec'].isna()].copy()
+data0_filtered = filtered_data['Utec'].isna().copy()
 
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 data0_filtered['Clase de orden'] = None
