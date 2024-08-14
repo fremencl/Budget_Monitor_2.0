@@ -299,6 +299,9 @@ data0['Período'] = data0['Período'].astype(str)
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
 
+# Asegurarse de que los valores en 'Valor/mon.inf.' sean enteros
+data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].astype(int)
+
 # FILTROS en la barra lateral
 st.sidebar.markdown("### Filtros")
 selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio'].unique().tolist(), default=['2024'])
@@ -327,6 +330,9 @@ budget_data_filtered = budget_data[
 if all_processes_selected:
     budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
     budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
+
+# Redondear valores y asegurarse de que sean enteros
+data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].round(0).astype(int)
 
 # Calcular las sumas por año y mes para Gasto Real
 gasto_real = data0.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
