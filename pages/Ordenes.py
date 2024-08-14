@@ -323,6 +323,16 @@ filtered_utec = filtered_data[~filtered_data['Utec'].isna()].copy()
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 filtered_utec['Clase de orden'] = None
 
+# Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
+filtered_utec['Orden partner'] = filtered_utec['Orden partner'].astype(str)
+orders_data['Orden'] = orders_data['Orden'].astype(str)
+
+# Crear un diccionario para el mapeo de 'Orden' a 'Clase de orden'
+orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden']))
+
+# Mapear "Clase de orden" usando el diccionario
+filtered_utec['Clase de orden'] = filtered_utec['Orden partner'].map(orden_to_clase_dict)
+
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
     buffer = io.StringIO()
@@ -340,16 +350,6 @@ st.download_button(
     file_name='filtered_utec.csv',
     mime='text/csv',
 )
-
-# Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
-filtered_utec['Orden partner'] = filtered_utec['Orden partner'].astype(str)
-orders_data['Orden'] = orders_data['Orden'].astype(str)
-
-# Crear un diccionario para el mapeo de 'Orden' a 'Clase de orden'
-orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden']))
-
-# Mapear "Clase de orden" usando el diccionario
-filtered_utec['Clase de orden'] = filtered_utec['Orden partner'].map(orden_to_clase_dict)
 
 # Verificar que la columna "Valor/mon.inf." esté en millones
 filtered_utec['Valor/mon.inf.'] = (filtered_utec['Valor/mon.inf.'] / 1000000).round(1)
