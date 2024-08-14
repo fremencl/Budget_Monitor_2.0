@@ -309,7 +309,7 @@ selected_procesos = st.sidebar.multiselect("Selecciona el proceso", data0['Proce
 selected_familias = st.sidebar.multiselect("Selecciona la Familia_Cuenta", ['Materiales', 'Servicios'], default=['Materiales', 'Servicios'])
 
 # Verificar si todos los procesos están seleccionados
-#all_processes_selected = set(selected_procesos) == set(data0['Proceso'].unique().tolist())
+all_processes_selected = set(selected_procesos) == set(data0['Proceso'].unique().tolist())
 
 # Aplicar los filtros después de calcular las sumatorias
 filtered_data = data0[
@@ -326,47 +326,60 @@ budget_data_filtered = budget_data[
     (budget_data['Familia_Cuenta'].isin(selected_familias))
 ]
 
+# Si todos los procesos están seleccionados, incluir presupuesto overhead
+if all_processes_selected:
+    budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
+    budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
+
 # Redondear valores y asegurarse de que sean enteros
 data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].round(0).astype(int)
 
-# Filtrar data0 excluyendo filas donde la columna Utec esté vacía
-data0_filtered = data0[~data0['Utec'].isna()].copy()
+# Calcular las sumas por año y mes para Gasto Real
+gasto_real = data0.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
+gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
 
-# Agregar una nueva columna "Clase de orden" a data0_filtered
-data0_filtered['Clase de orden'] = None
+# Asegurarse de que las columnas son del mismo tipo
+gasto_real['Año'] = gasto_real['Año'].astype(str)
+gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para orden correcto
 
-# Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
-data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
-                                      how='left', 
-                                      left_on='Orden partner', 
-                                      right_on='Orden')
+# Gráfico de Columnas Apiladas con Presupuesto
+st.markdown("### Gasto Real por Tipo de Orden")
 
-# Eliminar la columna 'Orden' redundante después del merge
-#data0_filtered.drop(columns=['Orden'], inplace=True)
+# Unir data0 con orders_data para obtener el tipo de orden
+data0 = data0.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
 
-# Verificar que la columna "Valor/mon.inf." esté en millones
-data0_filtered['Valor/mon.inf.'] = (data0_filtered['Valor/mon.inf.'] / 1000000).round(1)
+# Calcular las métricas para cada tipo de orden
+tipo_orden_metrics = data0.groupby('Clase de orden').agg(
+    cantidad_ordenes=pd.NamedAgg(column='Orden partner', aggfunc='count'),
+    gasto=pd.NamedAgg(column='Valor/mon.inf.', aggfunc='sum')
+).reset_index()
 
+# Calcular el valor OT medio
+tipo_orden_metrics['valor_ot_media'] = tipo_orden_metrics['gasto'] / tipo_orden_metrics['cantidad_ordenes']
+
+# Seleccionar columnas específicas para mostrar
+tipo_orden_metrics_display = tipo_orden_metrics[['Clase de orden', 'cantidad_ordenes', 'gasto', 'valor_ot_media']]
+
+# Renombrar las columnas para la visualización
+tipo_orden_metrics_display.columns = ['Tipo de orden', 'Cantidad de ordenes', 'Gasto', 'Valor OT media']
+
+# Redondear valor_ot_media a 0 decimales
+tipo_orden_metrics_display['Valor OT media'] = tipo_orden_metrics_display['Valor OT media'].round(0).astype(int)
 # Preparar los datos para el gráfico de columnas apiladas
 data0['Mes'] = data0['Período'].astype(int)
 data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
-# Crear la gráfica de barras apiladas
 fig_columnas = go.Figure()
 
 # Añadir las columnas apiladas por tipo de orden
 for column in data0_pivot.columns:
-    fig_columnas.add_trace(go.Bar(x=data0_pivot.index, y=data0_pivot[column], name=column))
+    if column != 'Presupuesto':
+        fig_columnas.add_trace(go.Bar(x=data0_pivot.index, y=data0_pivot[column], name=column))
 
-# Configuración final del gráfico
-fig_columnas.update_layout(
-    barmode='stack',
-    title='Gasto Real por Tipo de Orden',
-    xaxis_title='Mes',
-    yaxis_title='Gasto (Millones)',
-    legend_title='Tipo de Orden'
-)
+# Añadir la línea de presupuesto
+#fig_columnas.add_trace(go.Scatter(x=data0_pivot.index, y=data0_pivot['Presupuesto'], mode='lines+markers', name='Presupuesto', line=dict(color='grey', width=2, dash='dash')))
 
-# Mostrar el gráfico en Streamlit
+fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden vs Presupuesto', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
 st.plotly_chart(fig_columnas)
