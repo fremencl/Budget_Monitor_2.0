@@ -314,7 +314,7 @@ csv_data0 = convertir_a_csv(data0)
 st.download_button(
     label="Descargar_data0",
     data=csv_data0,
-    file_name='filas_data0',
+    file_name='filas_data0.csv',
     mime='text/csv',
 )
 
