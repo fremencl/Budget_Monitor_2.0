@@ -345,13 +345,6 @@ data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']],
                                       left_on='Orden partner', 
                                       right_on='Orden')
 
-# Verificar si el mapeo fue exitoso
-if data0_filtered['Clase de orden'].isna().all():
-    st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
-else:
-    st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
-    st.write(data0_filtered[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
-
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
     buffer = io.StringIO()
@@ -369,6 +362,13 @@ st.download_button(
     file_name='filas_data0_filtered.csv',
     mime='text/csv',
 )
+
+# Verificar si el mapeo fue exitoso
+if data0_filtered['Clase de orden'].isna().all():
+    st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
+else:
+    st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
+    st.write(data0_filtered[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
 
 # Eliminar la columna 'Orden' redundante después del merge
 data0_filtered.drop(columns=['Orden'], inplace=True)
