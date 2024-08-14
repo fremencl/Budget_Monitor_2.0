@@ -335,11 +335,22 @@ data0_filtered = data0[~data0['Utec'].isna()].copy()
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 data0_filtered['Clase de orden'] = None
 
+# Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
+data0_filtered['Orden partner'] = data0_filtered['Orden partner'].astype(str)
+orders_data['Orden'] = orders_data['Orden'].astype(str)
+
 # Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
 data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
                                       how='left', 
                                       left_on='Orden partner', 
                                       right_on='Orden')
+
+# Verificar si el mapeo fue exitoso
+if data0_filtered['Clase de orden'].isna().all():
+    st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
+else:
+    st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
+    st.write(data0_filtered[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
 
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
@@ -358,13 +369,6 @@ st.download_button(
     file_name='filas_data0_filtered.csv',
     mime='text/csv',
 )
-
-# Verificar si la columna "Clase de orden" existe y no tiene valores NaN
-if 'Clase de orden' not in data0_filtered.columns:
-    st.error("La columna 'Clase de orden' no se creó correctamente en el merge.")
-else:
-    st.write("Verificación: La columna 'Clase de orden' se creó correctamente.")
-    st.write(data0_filtered[['Orden partner', 'Clase de orden']].head())  # Muestra las primeras filas para verificar
 
 # Eliminar la columna 'Orden' redundante después del merge
 data0_filtered.drop(columns=['Orden'], inplace=True)
