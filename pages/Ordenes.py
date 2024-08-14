@@ -326,13 +326,23 @@ budget_data_filtered = budget_data[
     (budget_data['Familia_Cuenta'].isin(selected_familias))
 ]
 
-# Si todos los procesos están seleccionados, incluir presupuesto overhead
-#if all_processes_selected:
-    #budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
-    #budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
-
 # Redondear valores y asegurarse de que sean enteros
 data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].round(0).astype(int)
+
+# Calcular las sumas por año y mes para Gasto Real
+gasto_real = data0.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
+gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
+gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
+
+# Asegurarse de que las columnas son del mismo tipo
+gasto_real['Año'] = gasto_real['Año'].astype(str)
+gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para orden correcto
+
+# Gráfico de Columnas Apiladas con Presupuesto
+st.markdown("### Gasto Real por Tipo de Orden")
+
+# Unir data0 con orders_data para obtener el tipo de orden
+data0 = data0.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
 
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
@@ -351,20 +361,6 @@ st.download_button(
     file_name='filas_data0.csv',
     mime='text/csv',
 )
-# Calcular las sumas por año y mes para Gasto Real
-gasto_real = data0.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
-gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
-gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
-
-# Asegurarse de que las columnas son del mismo tipo
-gasto_real['Año'] = gasto_real['Año'].astype(str)
-gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para orden correcto
-
-# Gráfico de Columnas Apiladas con Presupuesto
-st.markdown("### Gasto Real por Tipo de Orden")
-
-# Unir data0 con orders_data para obtener el tipo de orden
-data0 = data0.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
 
 # Calcular las métricas para cada tipo de orden
 tipo_orden_metrics = data0.groupby('Clase de orden').agg(
