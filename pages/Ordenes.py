@@ -327,6 +327,10 @@ filtered_utec['Clase de orden'] = None
 filtered_utec['Orden partner'] = filtered_utec['Orden partner'].astype(str)
 orders_data['Orden'] = orders_data['Orden'].astype(str)
 
+# Asegurarse de que la columna 'Clase de orden' sea del mismo tipo en ambos DataFrames
+filtered_utec['Clase de orden'] = filtered_utec['Clase de orden'].astype(str)
+orders_data['Clase de orden'] = orders_data['Clase de orden'].astype(str)
+
 # Crear un diccionario para el mapeo de 'Orden' a 'Clase de orden'
 orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden']))
 
