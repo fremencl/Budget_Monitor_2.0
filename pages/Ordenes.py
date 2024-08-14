@@ -324,8 +324,8 @@ filtered_utec = filtered_data[~filtered_data['Utec'].isna()].copy()
 filtered_utec['Clase de orden'] = None
 
 # Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
-filtered_utec['Orden partner'] = filtered_utec['Orden partner'].str.strip()
-orders_data['Orden'] = orders_data['Orden'].str.strip()
+filtered_utec['Orden partner'] = filtered_utec['Orden partner'].astype(str)
+orders_data['Orden'] = orders_data['Orden'].astype(str)
 
 # Crear un diccionario para el mapeo de 'Orden' a 'Clase de orden'
 orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden']))
