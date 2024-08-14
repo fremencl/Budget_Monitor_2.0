@@ -317,9 +317,6 @@ filtered_data = data0[
 # Redondear valores y asegurarse de que sean enteros
 filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
-# Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
-filtered_data = filtered_data['Utec'].isna().copy()
-
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
     buffer = io.StringIO()
@@ -337,6 +334,9 @@ st.download_button(
     file_name='filtered_data.csv',
     mime='text/csv',
 )
+
+# Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
+filtered_data = filtered_data['Utec'].isna().copy()
 
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 filtered_data0['Clase de orden'] = None
