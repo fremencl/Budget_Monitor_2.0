@@ -5,8 +5,7 @@ import plotly.graph_objects as go
 import io
 
 # Título de la aplicación
-st.markdown("<h1 style='text-align: center; color: black; font-size: 24px;'>MONITOR GESTIÓN PRESUPUESTARIA</h1>", unsafe_allow_html=True)
-st.markdown("<h2 style='text-align: center; color: black; font-size: 24px;'>ANALISIS AGREGADO: GASTO Y PRESUPUESTO</h2>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: black; font-size: 24px;'>MONITOR GESTIÓN ORDENES</h1>", unsafe_allow_html=True)
 
 # CSS para ajustar el ancho del sidebar
 st.markdown(
