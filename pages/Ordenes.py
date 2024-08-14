@@ -60,8 +60,6 @@ assert 'Recinto' in base_ceco_data.columns, "La columna 'Recinto' no está prese
 # Asegurarse de que 'Ejercicio' y 'Período' son de tipo string
 data0['Ejercicio'] = data0['Ejercicio'].astype(str)
 data0['Período'] = data0['Período'].astype(str)
-budget_data['Año'] = budget_data['Año'].astype(str)
-budget_data['Mes'] = budget_data['Mes'].astype(str)
 
 # Agregar nuevas columnas a data0
 data0['Utec'] = None
@@ -302,6 +300,24 @@ data0['Recinto'] = data0['Recinto'].astype(str)
 # Asegurarse de que los valores en 'Valor/mon.inf.' sean enteros
 data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].astype(int)
 
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+
+# Generar el enlace de descarga para las filas procesadas
+csv_data0 = convertir_a_csv(data0)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_data0",
+    data=csv_data0,
+    file_name='filas_data0',
+    mime='text/csv',
+)
+
 # FILTROS en la barra lateral
 st.sidebar.markdown("### Filtros")
 selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio'].unique().tolist(), default=['2024'])
@@ -324,24 +340,6 @@ filtered_data0 = filtered_data['Utec'].isna().copy()
 
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 filtered_data0['Clase de orden'] = None
-
-# Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
-
-# Generar el enlace de descarga para las filas procesadas
-csv_filtered_data0 = convertir_a_csv(filtered_data0)
-
-# Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_filtered_data0",
-    data=csv_filtered_data0,
-    file_name='filas_filtered_data0',
-    mime='text/csv',
-)
 
 # Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
 filtered_data0['Orden partner'] = filtered_data0['Orden partner'].astype(str)
