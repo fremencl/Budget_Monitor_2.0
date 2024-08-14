@@ -317,6 +317,12 @@ filtered_data = data0[
 # Redondear valores y asegurarse de que sean enteros
 filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
+# Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
+filtered_utec = filtered_data['Utec'].isna().copy()
+
+# Agregar una nueva columna "Clase de orden" a data0_filtered
+filtered_utec['Clase de orden'] = None
+
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
     buffer = io.StringIO()
@@ -325,21 +331,15 @@ def convertir_a_csv(df):
     return buffer.getvalue()
 
 # Generar el enlace de descarga para las filas procesadas
-csv_filtered_data = convertir_a_csv(filtered_data)
+csv_filtered_utec = convertir_a_csv(filtered_utec)
 
 # Agregar un botón de descarga en la aplicación
 st.download_button(
-    label="Descargar_filtered_data",
-    data=csv_filtered_data,
-    file_name='filtered_data.csv',
+    label="Descargar_filtered_utec",
+    data=csv_filtered_utec,
+    file_name='filtered_utec.csv',
     mime='text/csv',
 )
-
-# Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
-filtered_data = filtered_data['Utec'].isna().copy()
-
-# Agregar una nueva columna "Clase de orden" a data0_filtered
-filtered_data0['Clase de orden'] = None
 
 # Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
 filtered_data0['Orden partner'] = filtered_data0['Orden partner'].astype(str)
