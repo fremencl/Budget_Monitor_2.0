@@ -331,6 +331,9 @@ if all_processes_selected:
 # Gráfico de Columnas Apiladas con Presupuesto
 st.markdown("### Gráfico de Gasto Real por Tipo de Orden y Presupuesto")
 
+# Unir data0 con orders_data para obtener el tipo de orden
+data0 = data0.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
+
 # Preparar los datos para el gráfico de columnas apiladas
 data0['Mes'] = data0['Período'].astype(int)
 data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
