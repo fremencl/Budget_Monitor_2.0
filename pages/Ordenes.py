@@ -318,7 +318,7 @@ filtered_data = data0[
 filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
 # Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
-filtered_utec = filtered_data['Utec'].isna().copy()
+filtered_utec = filtered_data[~filtered_data['Utec'].isna()].copy()
 
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 filtered_utec['Clase de orden'] = None
