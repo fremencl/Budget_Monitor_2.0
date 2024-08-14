@@ -319,18 +319,11 @@ filtered_data = data0[
     (~data0['Familia_Cuenta'].isna())  # Excluir filas con NaN en 'Familia_Cuenta'
 ]
 
-# Aplicar los mismos filtros a budget_data
-budget_data_filtered = budget_data[
-    (budget_data['Año'].isin(selected_years)) & 
-    (budget_data['Proceso'].isin(selected_procesos)) & 
-    (budget_data['Familia_Cuenta'].isin(selected_familias))
-]
-
 # Redondear valores y asegurarse de que sean enteros
-data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].round(0).astype(int)
+filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
-# Filtrar data0 excluyendo filas donde la columna Utec esté vacía
-data0_filtered = data0[~data0['Utec'].isna()].copy()
+# Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
+data0_filtered = filtered_data[~data0['Utec'].isna()].copy()
 
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 data0_filtered['Clase de orden'] = None
