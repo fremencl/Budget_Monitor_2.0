@@ -320,10 +320,28 @@ filtered_data = data0[
 filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
 # Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
-data0_filtered = filtered_data['Utec'].isna().copy()
+filtered_data = filtered_data['Utec'].isna().copy()
 
 # Agregar una nueva columna "Clase de orden" a data0_filtered
-data0_filtered['Clase de orden'] = None
+filtered_data['Clase de orden'] = None
+
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+
+# Generar el enlace de descarga para las filas procesadas
+csv_filtered_data = convertir_a_csv(filtered_data)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_filtered_data",
+    data=csv_filtered_data,
+    file_name='filas_filtered_data',
+    mime='text/csv',
+)
 
 # Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
 data0_filtered['Orden partner'] = data0_filtered['Orden partner'].astype(str)
@@ -341,24 +359,6 @@ if data0_filtered['Clase de orden'].isna().all():
 else:
     st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
     st.write(data0_filtered[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
-
-# Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
-
-# Generar el enlace de descarga para las filas procesadas
-csv_data0_filtered = convertir_a_csv(data0_filtered)
-
-# Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_data0_filtered",
-    data=csv_data0_filtered,
-    file_name='filas_data0_filtered.csv',
-    mime='text/csv',
-)
 
 # Eliminar la columna 'Orden' redundante después del merge
 #data0_filtered.drop(columns=['Orden'], inplace=True)
