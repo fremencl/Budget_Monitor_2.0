@@ -334,6 +334,23 @@ st.markdown("### Gráfico de Gasto Real por Tipo de Orden y Presupuesto")
 # Unir data0 con orders_data para obtener el tipo de orden
 data0 = data0.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
 
+# Calcular las métricas para cada tipo de orden
+tipo_orden_metrics = data0.groupby('Clase de orden').agg(
+    cantidad_ordenes=pd.NamedAgg(column='Orden partner', aggfunc='count'),
+    gasto=pd.NamedAgg(column='Valor/mon.inf.', aggfunc='sum')
+).reset_index()
+
+# Calcular el valor OT medio
+tipo_orden_metrics['valor_ot_media'] = tipo_orden_metrics['gasto'] / tipo_orden_metrics['cantidad_ordenes']
+
+# Seleccionar columnas específicas para mostrar
+tipo_orden_metrics_display = tipo_orden_metrics[['Clase de orden', 'cantidad_ordenes', 'gasto', 'valor_ot_media']]
+
+# Renombrar las columnas para la visualización
+tipo_orden_metrics_display.columns = ['Tipo de orden', 'Cantidad de ordenes', 'Gasto', 'Valor OT media']
+
+# Redondear valor_ot_media a 0 decimales
+tipo_orden_metrics_display['Valor OT media'] = tipo_orden_metrics_display['Valor OT media'].round(0).astype(int)
 # Preparar los datos para el gráfico de columnas apiladas
 data0['Mes'] = data0['Período'].astype(int)
 data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
