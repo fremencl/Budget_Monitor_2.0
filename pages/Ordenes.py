@@ -320,10 +320,10 @@ filtered_data = data0[
 filtered_data['Valor/mon.inf.'] = filtered_data['Valor/mon.inf.'].round(0).astype(int)
 
 # Filtrar filtered_data excluyendo filas donde la columna Utec esté vacía
-filtered_data = filtered_data['Utec'].isna().copy()
+filtered_data0 = filtered_data['Utec'].isna().copy()
 
 # Agregar una nueva columna "Clase de orden" a data0_filtered
-filtered_data['Clase de orden'] = None
+filtered_data0['Clase de orden'] = None
 
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
@@ -333,42 +333,39 @@ def convertir_a_csv(df):
     return buffer.getvalue()
 
 # Generar el enlace de descarga para las filas procesadas
-csv_filtered_data = convertir_a_csv(filtered_data)
+csv_filtered_data0 = convertir_a_csv(filtered_data0)
 
 # Agregar un botón de descarga en la aplicación
 st.download_button(
-    label="Descargar_filtered_data",
-    data=csv_filtered_data,
-    file_name='filas_filtered_data',
+    label="Descargar_filtered_data0",
+    data=csv_filtered_data0,
+    file_name='filas_filtered_data0',
     mime='text/csv',
 )
 
 # Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
-filtered_data['Orden partner'] = filtered_data['Orden partner'].astype(str)
+filtered_data0['Orden partner'] = filtered_data0['Orden partner'].astype(str)
 orders_data['Orden'] = orders_data['Orden'].astype(str)
 
 # Crear un diccionario para el mapeo de 'Orden' a 'Clase de orden'
 orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden']))
 
 # Mapear "Clase de orden" usando el diccionario
-filtered_data['Clase de orden'] = filtered_data['Orden partner'].map(orden_to_clase_dict)
+filtered_data0['Clase de orden'] = filtered_data0['Orden partner'].map(orden_to_clase_dict)
 
 # Verificar si el mapeo fue exitoso
-if filtered_data['Clase de orden'].isna().all():
+if filtered_data0['Clase de orden'].isna().all():
     st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
 else:
     st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
-    st.write(filtered_data[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
-
-# Eliminar la columna 'Orden' redundante después del merge
-#data0_filtered.drop(columns=['Orden'], inplace=True)
+    st.write(filtered_data0[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
 
 # Verificar que la columna "Valor/mon.inf." esté en millones
-filtered_data['Valor/mon.inf.'] = (filtered_data['Valor/mon.inf.'] / 1000000).round(1)
+filtered_data0['Valor/mon.inf.'] = (filtered_data0['Valor/mon.inf.'] / 1000000).round(1)
 
 # Preparar los datos para el gráfico de columnas apiladas
-filtered_data['Mes'] = filtered_data['Período'].astype(int)
-data0_grouped = filtered_data.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
+filtered_data0['Mes'] = filtered_data0['Período'].astype(int)
+data0_grouped = filtered_data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
 # Crear la gráfica de barras apiladas
