@@ -369,15 +369,9 @@ st.download_button(
     file_name='filas_data0_filtered.csv',
     mime='text/csv',
 )
-# Verificar si el mapeo fue exitoso
-if data0_filtered['Clase de orden'].isna().all():
-    st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
-else:
-    st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
-    st.write(data0_filtered[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
 
 # Eliminar la columna 'Orden' redundante después del merge
-data0_filtered.drop(columns=['Orden'], inplace=True)
+#data0_filtered.drop(columns=['Orden'], inplace=True)
 
 # Verificar que la columna "Valor/mon.inf." esté en millones
 data0_filtered['Valor/mon.inf.'] = (data0_filtered['Valor/mon.inf.'] / 1000000).round(1)
