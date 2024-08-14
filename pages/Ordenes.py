@@ -341,9 +341,6 @@ gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para ord
 # Gráfico de Columnas Apiladas con Presupuesto
 st.markdown("### Gasto Real por Tipo de Orden")
 
-# Unir data0 con orders_data para obtener el tipo de orden
-data0 = data0.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
-
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
     buffer = io.StringIO()
@@ -361,6 +358,9 @@ st.download_button(
     file_name='filas_data0.csv',
     mime='text/csv',
 )
+
+# Unir data0 con orders_data para obtener el tipo de orden
+data0 = data0.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
 
 # Calcular las métricas para cada tipo de orden
 tipo_orden_metrics = data0.groupby('Clase de orden').agg(
