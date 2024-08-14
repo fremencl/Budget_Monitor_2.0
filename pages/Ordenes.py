@@ -344,31 +344,31 @@ st.download_button(
 )
 
 # Asegurarse de que las columnas involucradas en el mapeo sean del tipo string
-data0_filtered['Orden partner'] = data0_filtered['Orden partner'].astype(str)
+filtered_data['Orden partner'] = filtered_data['Orden partner'].astype(str)
 orders_data['Orden'] = orders_data['Orden'].astype(str)
 
 # Crear un diccionario para el mapeo de 'Orden' a 'Clase de orden'
 orden_to_clase_dict = dict(zip(orders_data['Orden'], orders_data['Clase de orden']))
 
 # Mapear "Clase de orden" usando el diccionario
-data0_filtered['Clase de orden'] = data0_filtered['Orden partner'].map(orden_to_clase_dict)
+filtered_data['Clase de orden'] = filtered_data['Orden partner'].map(orden_to_clase_dict)
 
 # Verificar si el mapeo fue exitoso
-if data0_filtered['Clase de orden'].isna().all():
+if filtered_data['Clase de orden'].isna().all():
     st.error("El mapeo de 'Clase de orden' no fue exitoso. Verifica los valores y tipos de las columnas involucradas.")
 else:
     st.success("El mapeo de 'Clase de orden' se realizó correctamente.")
-    st.write(data0_filtered[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
+    st.write(filtered_data[['Orden partner', 'Clase de orden']].head())  # Muestra una muestra de los datos para verificar
 
 # Eliminar la columna 'Orden' redundante después del merge
 #data0_filtered.drop(columns=['Orden'], inplace=True)
 
 # Verificar que la columna "Valor/mon.inf." esté en millones
-data0_filtered['Valor/mon.inf.'] = (data0_filtered['Valor/mon.inf.'] / 1000000).round(1)
+filtered_data['Valor/mon.inf.'] = (filtered_data['Valor/mon.inf.'] / 1000000).round(1)
 
 # Preparar los datos para el gráfico de columnas apiladas
-data0_filtered['Mes'] = data0_filtered['Período'].astype(int)
-data0_grouped = data0_filtered.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
+filtered_data['Mes'] = filtered_data['Período'].astype(int)
+data0_grouped = filtered_data.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
 # Crear la gráfica de barras apiladas
