@@ -341,8 +341,15 @@ data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']],
                                       left_on='Orden partner', 
                                       right_on='Orden')
 
+# Verificar si la columna "Clase de orden" existe y no tiene valores NaN
+if 'Clase de orden' not in data0_filtered.columns:
+    st.error("La columna 'Clase de orden' no se creó correctamente en el merge.")
+else:
+    st.write("Verificación: La columna 'Clase de orden' se creó correctamente.")
+    st.write(data0_filtered[['Orden partner', 'Clase de orden']].head())  # Muestra las primeras filas para verificar
+
 # Eliminar la columna 'Orden' redundante después del merge
-#data0_filtered.drop(columns=['Orden'], inplace=True)
+data0_filtered.drop(columns=['Orden'], inplace=True)
 
 # Verificar que la columna "Valor/mon.inf." esté en millones
 data0_filtered['Valor/mon.inf.'] = (data0_filtered['Valor/mon.inf.'] / 1000000).round(1)
