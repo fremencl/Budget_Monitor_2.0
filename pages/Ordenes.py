@@ -342,7 +342,7 @@ data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']],
                                       right_on='Orden')
 
 # Eliminar la columna 'Orden' redundante después del merge
-data0_filtered.drop(columns=['Orden'], inplace=True)
+#data0_filtered.drop(columns=['Orden'], inplace=True)
 
 # Verificar que la columna "Valor/mon.inf." esté en millones
 data0_filtered['Valor/mon.inf.'] = (data0_filtered['Valor/mon.inf.'] / 1000000).round(1)
