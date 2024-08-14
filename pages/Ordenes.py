@@ -299,6 +299,17 @@ data0['Período'] = data0['Período'].astype(str)
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
 
+# Generar el enlace de descarga para las filas procesadas
+csv_data0 = convertir_a_csv(data0)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_data0",
+    data=csv_data0,
+    file_name='filas_data0.csv',
+    mime='text/csv',
+)
+
 # FILTROS en la barra lateral
 st.sidebar.markdown("### Filtros")
 selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio'].unique().tolist(), default=['2024'])
