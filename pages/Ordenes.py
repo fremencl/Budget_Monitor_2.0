@@ -335,6 +335,23 @@ data0_filtered = data0[~data0['Utec'].isna()].copy()
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 data0_filtered['Clase de orden'] = None
 
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+
+# Generar el enlace de descarga para las filas procesadas
+csv_data0_filtered = convertir_a_csv(data0_filtered)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_data0_filtered",
+    data=csv_data0_filtered,
+    file_name='filas_data0_filtered.csv',
+    mime='text/csv',
+)
 # Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
 data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
                                       how='left', 
