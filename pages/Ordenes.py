@@ -341,13 +341,13 @@ def convertir_a_csv(df):
     return buffer.getvalue()
 
 # Generar el enlace de descarga para las filas procesadas
-csv_filtered_utec = convertir_a_csv(filtered_utec)
+csv_orders_data = convertir_a_csv(orders_data)
 
 # Agregar un botón de descarga en la aplicación
 st.download_button(
-    label="Descargar_filtered_utec",
-    data=csv_filtered_utec,
-    file_name='filtered_utec.csv',
+    label="Descargar_orders_data",
+    data=csv_orders_data,
+    file_name='orders_data.csv',
     mime='text/csv',
 )
 
