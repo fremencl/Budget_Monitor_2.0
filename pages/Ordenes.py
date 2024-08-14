@@ -335,6 +335,12 @@ data0_filtered = data0[~data0['Utec'].isna()].copy()
 # Agregar una nueva columna "Clase de orden" a data0_filtered
 data0_filtered['Clase de orden'] = None
 
+# Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
+data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
+                                      how='left', 
+                                      left_on='Orden partner', 
+                                      right_on='Orden')
+
 # Función para convertir DataFrame a CSV
 def convertir_a_csv(df):
     buffer = io.StringIO()
@@ -352,11 +358,6 @@ st.download_button(
     file_name='filas_data0_filtered.csv',
     mime='text/csv',
 )
-# Mapear "Clase de orden" a data0_filtered usando la columna "Orden partner" y "Orden"
-data0_filtered = data0_filtered.merge(orders_data[['Orden', 'Clase de orden']], 
-                                      how='left', 
-                                      left_on='Orden partner', 
-                                      right_on='Orden')
 
 # Verificar si la columna "Clase de orden" existe y no tiene valores NaN
 if 'Clase de orden' not in data0_filtered.columns:
