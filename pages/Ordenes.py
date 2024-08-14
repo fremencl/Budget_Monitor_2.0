@@ -299,24 +299,6 @@ data0['Período'] = data0['Período'].astype(str)
 data0['Familia_Cuenta'] = data0['Familia_Cuenta'].astype(str)
 data0['Recinto'] = data0['Recinto'].astype(str)
 
-# Función para convertir DataFrame a CSV
-def convertir_a_csv(df):
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False, sep=';')
-    buffer.seek(0)
-    return buffer.getvalue()
-    
-# Generar el enlace de descarga para las filas procesadas
-csv_data0 = convertir_a_csv(data0)
-
-# Agregar un botón de descarga en la aplicación
-st.download_button(
-    label="Descargar_data0",
-    data=csv_data0,
-    file_name='filas_data0.csv',
-    mime='text/csv',
-)
-
 # FILTROS en la barra lateral
 st.sidebar.markdown("### Filtros")
 selected_years = st.sidebar.multiselect("Selecciona el año", data0['Ejercicio'].unique().tolist(), default=['2024'])
@@ -354,6 +336,24 @@ gasto_real = gasto_real.rename(columns={'Ejercicio': 'Año', 'Período': 'Mes'})
 # Asegurarse de que las columnas son del mismo tipo
 gasto_real['Año'] = gasto_real['Año'].astype(str)
 gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para orden correcto
+
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+    
+# Generar el enlace de descarga para las filas procesadas
+csv_data0 = convertir_a_csv(data0)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_data0",
+    data=csv_data0,
+    file_name='filas_data0.csv',
+    mime='text/csv',
+)
 
 # Gráfico de Columnas Apiladas con Presupuesto
 st.markdown("### Gráfico de Gasto Real por Tipo de Orden y Presupuesto")
