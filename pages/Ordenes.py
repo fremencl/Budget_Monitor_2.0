@@ -351,13 +351,13 @@ def convertir_a_csv(df):
     return buffer.getvalue()
     
 # Generar el enlace de descarga para las filas procesadas
-csv_data0 = convertir_a_csv(data0)
+csv_gasto_real = convertir_a_csv(gasto_real)
 
 # Agregar un botón de descarga en la aplicación
 st.download_button(
-    label="Descargar_data0",
-    data=csv_data0,
-    file_name='filas_data0.csv',
+    label="Descargar_gasto_real",
+    data=csv_gasto_real,
+    file_name='filas_gasto_real.csv',
     mime='text/csv',
 )
 
