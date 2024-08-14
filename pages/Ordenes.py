@@ -334,6 +334,23 @@ budget_data_filtered = budget_data[
 # Redondear valores y asegurarse de que sean enteros
 data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].round(0).astype(int)
 
+# Función para convertir DataFrame a CSV
+def convertir_a_csv(df):
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False, sep=';')
+    buffer.seek(0)
+    return buffer.getvalue()
+
+# Generar el enlace de descarga para las filas procesadas
+csv_data0 = convertir_a_csv(data0)
+
+# Agregar un botón de descarga en la aplicación
+st.download_button(
+    label="Descargar_data0",
+    data=csv_data0,
+    file_name='filas_data0.csv',
+    mime='text/csv',
+)
 # Calcular las sumas por año y mes para Gasto Real
 gasto_real = data0.groupby(['Ejercicio', 'Período'])['Valor/mon.inf.'].sum().reset_index()
 gasto_real['Valor/mon.inf.'] = (gasto_real['Valor/mon.inf.'] / 1000000).round(1)  # Convertir a millones con un decimal
