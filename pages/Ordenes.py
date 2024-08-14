@@ -309,7 +309,7 @@ selected_procesos = st.sidebar.multiselect("Selecciona el proceso", data0['Proce
 selected_familias = st.sidebar.multiselect("Selecciona la Familia_Cuenta", ['Materiales', 'Servicios'], default=['Materiales', 'Servicios'])
 
 # Verificar si todos los procesos están seleccionados
-all_processes_selected = set(selected_procesos) == set(data0['Proceso'].unique().tolist())
+#all_processes_selected = set(selected_procesos) == set(data0['Proceso'].unique().tolist())
 
 # Aplicar los filtros después de calcular las sumatorias
 filtered_data = data0[
@@ -327,9 +327,9 @@ budget_data_filtered = budget_data[
 ]
 
 # Si todos los procesos están seleccionados, incluir presupuesto overhead
-if all_processes_selected:
-    budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
-    budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
+#if all_processes_selected:
+    #budget_data_overhead = budget_data[budget_data['Proceso'] == 'Overhead']
+    #budget_data_filtered = pd.concat([budget_data_filtered, budget_data_overhead], ignore_index=True)
 
 # Redondear valores y asegurarse de que sean enteros
 data0['Valor/mon.inf.'] = data0['Valor/mon.inf.'].round(0).astype(int)
