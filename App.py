@@ -7,19 +7,10 @@ def get_project_root() -> Path:
     return Path(__file__).parent
 
 def load_image(image_name: str) -> Image:
-    """Loads an image from the specified path.
-
-    Parameters
-    ----------
-    image_name : str
-        Local path of the image.
-
-    Returns
-    -------
-    Image
-        Image to be displayed.
-    """
-    return Image.open(Path(get_project_root()) / f"assets/{image_name}")
+    """Loads an image from the specified path."""
+    image_path = Path(get_project_root()) / f"assets/{image_name}"
+    print(f"Trying to load image from: {image_path}")  # Agrega esto para depurar
+    return Image.open(image_path)
 
 # Configuración de la aplicación
 st.set_page_config(
