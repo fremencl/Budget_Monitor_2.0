@@ -1,31 +1,30 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="Vehicle Incidents in England",
-    page_icon=":pickup_truck:",
+    page_title="Gerencia Gestion de Activos",
+    page_icon=":dollar:",
     initial_sidebar_state="expanded",
 )
 
-st.write("# VEHICLE INCIDENTS IN ENGLAND :pickup_truck:")
+st.write("# MONITOR DE GESTION PRESUPUESTARIA :chart_with_upwards_trend:")
 
-st.sidebar.success("Select a demo above.")
+st.sidebar.success("Selecciona un modelo de analisis de arriba.")
 
 st.markdown(
-    """##### We are exploring Vehicle incidents accross england whilst utilising the capabilities of Streamlit, Snowflake, Carto and Tableau.
+    """##### Exploraremos tendencias y ratios relacionados con el perfil del Gasto de Mantenimiento de nuestra Gerencia
     
-Click through the pages to view all towns in England based on real data, then see how this relates to Integrated Care Boards.
+En la actual etapa de desarrollo de esta aplicacion, estan disponibles 2 modulos: Gastos y Ordenes
 
-Explore The Details of your chosen City and see how this is indexed into the H3 geospatial grid (Hexagons). Carto's Toolkit shared within Snowflake has been utilised for this. You may also see this within a radius of your chosen city.
+El Modelo de Gastos te permitirá comparar gasto real y presupuesto bajo diferentes perspectivas.
 
-Finally, Explore How Vehicle incidents relate to fire service areas.
+El Modelo de Ordenes te permitirá relacionar ordenes y sus respectivos gastos, así como una primera aproximacion a KPI´s asociados.
 
-All the raw data has been curated, engineered and processed with Snowflake. There are also 3 dashboards created using Tableau Cloud to visualise off live Snowflake data. Folium and Matplotlib has also been used for some visuals. Enjoy :smile:
+En ambos modulos cuentas con filtros dinámicos para poder ajustar las vistas de las herramientas de análisis y desagregar la informacion por:
+Año
+Proceso (Producción, Distribución, Recolección o Depuración)
+Tipo de gasto (Materiales o Servicios)
 
-
-All code can be accessed here:
-
-https://github.com/beckyoconnor/Vehicle_Incidents_uk/
-
+:moneybag:
 
 """
 )
