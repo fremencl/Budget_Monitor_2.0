@@ -371,20 +371,33 @@ data0['Mes'] = data0['Período'].astype(int)
 data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
+# Definir los colores específicos para cada tipo de OT
+colores_ot = {
+    'PM01': 'red',
+    'PM02': 'blue',
+    'PM03': 'lightblue',
+    'PM04': 'orange',
+    'PM05': 'pink',
+}
+
 fig_columnas = go.Figure()
 
-# Añadir las columnas apiladas por tipo de orden
+# Añadir las columnas apiladas por tipo de orden con los colores definidos
 for column in data0_pivot.columns:
     if column != 'Presupuesto':
-        fig_columnas.add_trace(go.Bar(x=data0_pivot.index, y=data0_pivot[column], name=column))
+        color = colores_ot.get(column, 'grey')  # Usar el color definido o 'grey' por defecto
+        fig_columnas.add_trace(go.Bar(x=data0_pivot.index, y=data0_pivot[column], name=column, marker_color=color))
 
 fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden vs Presupuesto', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
 st.plotly_chart(fig_columnas)
 
 # Seccion Metricas OT
-st.markdown("### Miremos algunas métricas de nuestras Ordenes de Trabajo")
+st.markdown("#### Miremos algunas métricas de nuestras Ordenes de Trabajo")
 # Mostrar tabla metricas OT
-st.dataframe(tipo_orden_metrics_display)
+#st.dataframe(tipo_orden_metrics_display)
+# Mostrar tabla metricas OT sin la columna de índices
+st.dataframe(tipo_orden_metrics_display.set_index('Tipo de orden'))
+
 
 # Nueva sección: Tabla de los 5 mayores gastos
 st.markdown("#### Top 5 Mayores Gastos")
@@ -400,4 +413,6 @@ top_5_gastos = data0_sorted.head(5)
 top_5_gastos_display = top_5_gastos[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']]
 
 # Mostrar la tabla en la aplicación Streamlit
-st.dataframe(top_5_gastos_display)
+#st.dataframe(top_5_gastos_display)
+# Mostrar la tabla de los 5 mayores gastos sin la columna de índices
+st.dataframe(top_5_gastos_display.set_index('Centro de coste'))
