@@ -37,9 +37,9 @@ st.sidebar.success("Selecciona un modelo de análisis de arriba")
 st.write("")
 st.markdown(
     """##### Exploraremos tendencias y ratios relacionados con el perfil del Gasto de Mantenimiento de nuestra Gerencia
-st.write("")
+
     
-En la actual etapa de desarrollo de esta aplicación, están disponibles 2 módulos: **Gastos** y **Órdenes**.
+En la actual etapa de desarrollo de esta aplicación, están disponibles 2 módulos: **Gastos** y **Ordenes**.
 
 - **Modelo de Gastos**: Te permitirá comparar gasto real y presupuesto bajo diferentes perspectivas.
 - **Modelo de Órdenes**: Te permitirá relacionar órdenes y sus respectivos gastos, así como una primera aproximación a KPIs asociados.
