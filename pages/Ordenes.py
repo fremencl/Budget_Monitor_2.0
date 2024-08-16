@@ -346,11 +346,10 @@ gasto_real['Mes'] = gasto_real['Mes'].astype(int)  # Convertir a entero para ord
 # Gráfico de Columnas Apiladas con Presupuesto
 st.markdown("### Gasto Real por Tipo de Orden")
 
-# Unir data0 con orders_data para obtener el tipo de orden
-data0 = data0.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
+filtered_data = filtered_data.merge(orders_data, how='left', left_on='Orden partner', right_on='Orden')
 
 # Calcular las métricas para cada tipo de orden
-tipo_orden_metrics = data0.groupby('Clase de orden').agg(
+tipo_orden_metrics = filtered_data.groupby('Clase de orden').agg(
     cantidad_ordenes=pd.NamedAgg(column='Orden partner', aggfunc='count'),
     gasto=pd.NamedAgg(column='Valor/mon.inf.', aggfunc='sum')
 ).reset_index()
@@ -374,6 +373,10 @@ filtered_data['Mes'] = filtered_data['Período'].astype(int)
 data0_grouped = filtered_data.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
+# Preparar los datos para el gráfico de columnas apiladas
+filtered_data_grouped = filtered_data.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
+filtered_data_pivot = filtered_data_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
+
 # Definir los colores específicos para cada tipo de OT
 colores_ot = {
     'PM01': 'red',
@@ -386,10 +389,10 @@ colores_ot = {
 fig_columnas = go.Figure()
 
 # Añadir las columnas apiladas por tipo de orden con los colores definidos
-for column in data0_pivot.columns:
+for column in filtered_data_pivot.columns:
     if column != 'Presupuesto':
         color = colores_ot.get(column, 'grey')  # Usar el color definido o 'grey' por defecto
-        fig_columnas.add_trace(go.Bar(x=data0_pivot.index, y=data0_pivot[column], name=column, marker_color=color))
+        fig_columnas.add_trace(go.Bar(x=filtered_data_pivot.index, y=filtered_data_pivot[column], name=column, marker_color=color))
 
 fig_columnas.update_layout(barmode='stack', title='', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
 st.plotly_chart(fig_columnas)
