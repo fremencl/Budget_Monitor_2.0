@@ -11,7 +11,7 @@ st.set_page_config(
 st.markdown(
     """
     <div style='text-align: center;'>
-        <img src='assets/logo.jpg' width='150'>
+        <img src='assets/Logo.jpg' width='150'>
     </div>
     """,
     unsafe_allow_html=True
