@@ -411,7 +411,7 @@ tipo_orden_metrics_display_reset = tipo_orden_metrics_display.reset_index(drop=T
 st.table(tipo_orden_metrics_display_reset)
 
 # Nueva sección: Tabla de los 5 mayores gastos
-st.markdown("#### Top 5 Mayores Gastos")
+st.markdown("#### Top 5 Mayores Gastos del Año")
 
 # Filtrar filas con 'Centro de coste' no vacío
 data0_filtered = filtered_data[filtered_data['Centro de coste'].notna() & (filtered_data['Centro de coste'] != '')]
