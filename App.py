@@ -26,7 +26,7 @@ with col2:
 
 # Títulos y subtítulos
 st.write("### MONITOR DE GESTION PRESUPUESTARIA :chart_with_upwards_trend:")
-st.write("#### GERENCIA GESTIÓN DE ACTIVOS")
+st.write("#### GERENCIA GESTION DE ACTIVOS")
 
 st.markdown("---")
 
