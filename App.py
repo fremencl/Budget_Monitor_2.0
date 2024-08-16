@@ -6,8 +6,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.write("# MONITOR DE GESTION PRESUPUESTARIA :chart_with_upwards_trend:")
-st.write("## GERENCIA GESTION DE ACTIVOS")
+st.write("### MONITOR DE GESTION PRESUPUESTARIA :chart_with_upwards_trend:")
+st.write("#### GERENCIA GESTION DE ACTIVOS")
 
 st.sidebar.success("Selecciona un modelo de analisis de arriba.")
 
@@ -25,7 +25,7 @@ Año
 Proceso (Producción, Distribución, Recolección o Depuración)
 Tipo de gasto (Materiales o Servicios)
 
-:moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag:
+:moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag::moneybag:
 
 """
 )
