@@ -25,15 +25,19 @@ with col2:
     st.image(load_image("Logo.jpg"), width=150)
 
 # Títulos y subtítulos
-st.write("### MONITOR DE GESTIÓN PRESUPUESTARIA :chart_with_upwards_trend:")
+st.write("### MONITOR DE GESTION PRESUPUESTARIA :chart_with_upwards_trend:")
 st.write("#### GERENCIA GESTIÓN DE ACTIVOS")
 
+st.markdown("---")
+
 # Mensaje en la barra lateral
-st.sidebar.success("Selecciona un modelo de análisis de arriba.")
+st.sidebar.success("Selecciona un modelo de análisis de arriba")
 
 # Contenido introductorio y descripción de la aplicación
+st.write("")
 st.markdown(
     """##### Exploraremos tendencias y ratios relacionados con el perfil del Gasto de Mantenimiento de nuestra Gerencia
+st.write("")
     
 En la actual etapa de desarrollo de esta aplicación, están disponibles 2 módulos: **Gastos** y **Órdenes**.
 
