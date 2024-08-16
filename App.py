@@ -1,4 +1,25 @@
 import streamlit as st
+from PIL import Image
+from pathlib import Path
+
+def get_project_root() -> Path:
+    """Returns the project root folder."""
+    return Path(__file__).parent
+
+def load_image(image_name: str) -> Image:
+    """Loads an image from the specified path.
+
+    Parameters
+    ----------
+    image_name : str
+        Local path of the image.
+
+    Returns
+    -------
+    Image
+        Image to be displayed.
+    """
+    return Image.open(Path(get_project_root()) / f"assets/{image_name}")
 
 # Configuración de la aplicación
 st.set_page_config(
@@ -7,8 +28,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Insertar el logo de la compañía
-load_image("assets/Logo.jpg")
+# Mostrar el logo de la compañía en el área principal
+st.image(load_image("logo.jpg"), width=300)  # Ajusta el 'width' según sea necesario
 
 # Títulos y subtítulos
 st.write("### MONITOR DE GESTIÓN PRESUPUESTARIA :chart_with_upwards_trend:")
