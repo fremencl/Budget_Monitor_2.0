@@ -22,7 +22,7 @@ st.set_page_config(
 # Crear tres columnas y mostrar la imagen en la columna central
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    st.image(load_image("Logo.jpg"), width=150, use_column_width=True)
+    st.image(load_image("Logo.jpg"), width=150)
 
 # Títulos y subtítulos
 st.write("### MONITOR DE GESTIÓN PRESUPUESTARIA :chart_with_upwards_trend:")
