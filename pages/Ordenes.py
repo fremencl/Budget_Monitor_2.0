@@ -391,9 +391,14 @@ for column in data0_pivot.columns:
 fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
 st.plotly_chart(fig_columnas)
 
-# Sección Métricas OT usando st.table
+# Sección Métricas OT
 st.markdown("### Miremos algunas métricas de nuestras Ordenes de Trabajo")
-st.table(tipo_orden_metrics_display)
+
+# Resetear el índice para eliminar la columna de índices y luego mostrar la tabla
+tipo_orden_metrics_display_reset = tipo_orden_metrics_display.reset_index(drop=True)
+
+# Mostrar la tabla sin la columna de índices
+st.table(tipo_orden_metrics_display_reset)
 
 # Nueva sección: Tabla de los 5 mayores gastos
 st.markdown("#### Top 5 Mayores Gastos")
@@ -405,8 +410,8 @@ data0_filtered = data0[data0['Centro de coste'].notna() & (data0['Centro de cost
 data0_sorted = data0_filtered.sort_values(by='Valor/mon.inf.', ascending=False)
 top_5_gastos = data0_sorted.head(5)
 
-# Seleccionar columnas específicas para mostrar
-top_5_gastos_display = top_5_gastos[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']]
+# Seleccionar columnas específicas para mostrar y resetear el índice
+top_5_gastos_display_reset = top_5_gastos[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']].reset_index(drop=True)
 
-# Mostrar la tabla en la aplicación Streamlit usando st.table
-st.table(top_5_gastos_display)
+# Mostrar la tabla sin la columna de índices
+st.table(top_5_gastos_display_reset)
