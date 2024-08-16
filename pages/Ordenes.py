@@ -394,6 +394,10 @@ st.plotly_chart(fig_columnas)
 # Sección Métricas OT
 st.markdown("### Miremos algunas métricas de nuestras Ordenes de Trabajo")
 
+# Formatear las columnas "Gasto" y "Valor OT media"
+tipo_orden_metrics_display['Gasto'] = tipo_orden_metrics_display['Gasto'].apply(lambda x: f"{x:,.0f}")
+tipo_orden_metrics_display['Valor OT media'] = tipo_orden_metrics_display['Valor OT media'].apply(lambda x: f"{x:,.0f}")
+
 # Resetear el índice para eliminar la columna de índices y luego mostrar la tabla
 tipo_orden_metrics_display_reset = tipo_orden_metrics_display.reset_index(drop=True)
 
@@ -410,8 +414,12 @@ data0_filtered = data0[data0['Centro de coste'].notna() & (data0['Centro de cost
 data0_sorted = data0_filtered.sort_values(by='Valor/mon.inf.', ascending=False)
 top_5_gastos = data0_sorted.head(5)
 
-# Seleccionar columnas específicas para mostrar y resetear el índice
-top_5_gastos_display_reset = top_5_gastos[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']].reset_index(drop=True)
+# Seleccionar columnas específicas para mostrar y formatear la columna "Valor/mon.inf."
+top_5_gastos_display = top_5_gastos[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']]
+top_5_gastos_display['Valor/mon.inf.'] = top_5_gastos_display['Valor/mon.inf.'].apply(lambda x: f"{x:,.0f}")
+
+# Resetear el índice para eliminar la columna de índices y luego mostrar la tabla
+top_5_gastos_display_reset = top_5_gastos_display.reset_index(drop=True)
 
 # Mostrar la tabla sin la columna de índices
 st.table(top_5_gastos_display_reset)
