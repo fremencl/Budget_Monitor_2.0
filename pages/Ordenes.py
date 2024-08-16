@@ -381,5 +381,23 @@ for column in data0_pivot.columns:
 fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden vs Presupuesto', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
 st.plotly_chart(fig_columnas)
 
+# Seccion Metricas OT
+st.markdown("### Miremos algunas métricas de nuestras Ordenes de Trabajo")
 # Mostrar tabla metricas OT
 st.dataframe(tipo_orden_metrics_display)
+
+# Nueva sección: Tabla de los 5 mayores gastos
+st.markdown("#### Top 5 Mayores Gastos")
+
+# Filtrar filas con 'Centro de coste' no vacío
+data0_filtered = data0[data0['Centro de coste'].notna() & (data0['Centro de coste'] != '')]
+
+# Filtrar y ordenar data0 para obtener los 5 mayores gastos
+data0_sorted = data0_filtered.sort_values(by='Valor/mon.inf.', ascending=False)
+top_5_gastos = data0_sorted.head(5)
+
+# Seleccionar columnas específicas para mostrar
+top_5_gastos_display = top_5_gastos[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']]
+
+# Mostrar la tabla en la aplicación Streamlit
+st.dataframe(top_5_gastos_display)
