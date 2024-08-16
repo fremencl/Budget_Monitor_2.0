@@ -7,15 +7,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Insertar el logo de la compañía centrado en la parte superior
-st.markdown(
-    """
-    <div style='text-align: center;'>
-        <img src='assets/Logo.jpg' width='150'>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Insertar el logo de la compañía
+load_image("'assets/Logo.jpg'"), use_column_width=True)
 
 # Títulos y subtítulos
 st.write("### MONITOR DE GESTIÓN PRESUPUESTARIA :chart_with_upwards_trend:")
