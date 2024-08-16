@@ -391,39 +391,9 @@ for column in data0_pivot.columns:
 fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
 st.plotly_chart(fig_columnas)
 
-# Sección Métricas OT
+# Sección Métricas OT usando st.table
 st.markdown("### Miremos algunas métricas de nuestras Ordenes de Trabajo")
-
-# Convertir la tabla a HTML
-tipo_orden_metrics_display_html = tipo_orden_metrics_display.to_html(index=False, classes='table table-striped')
-
-# Aplicar estilos CSS
-st.markdown(
-    f"""
-    <style>
-    .table {{
-        width: 100%;
-        text-align: left;
-    }}
-    .table th, .table td {{
-        padding: 8px;
-        text-align: left;
-        border: 1px solid #ddd;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }}
-    .table th {{
-        background-color: #f2f2f2;
-    }}
-    .table th:first-child {{
-        width: 200px;  /* Ajusta el ancho de la primera columna */
-    }}
-    </style>
-    {tipo_orden_metrics_display_html}
-    """,
-    unsafe_allow_html=True
-)
+st.table(tipo_orden_metrics_display)
 
 # Nueva sección: Tabla de los 5 mayores gastos
 st.markdown("#### Top 5 Mayores Gastos")
