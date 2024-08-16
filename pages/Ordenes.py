@@ -408,33 +408,5 @@ top_5_gastos = data0_sorted.head(5)
 # Seleccionar columnas específicas para mostrar
 top_5_gastos_display = top_5_gastos[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']]
 
-# Convertir la tabla a HTML
-top_5_gastos_display_html = top_5_gastos_display.to_html(index=False)
-
-# Aplicar estilos CSS
-st.markdown(
-    f"""
-    <style>
-    .dataframe {{
-        width: 100%;
-        text-align: left;
-    }}
-    .dataframe th, .dataframe td {{
-        padding: 8px;
-        text-align: left;
-        border: 1px solid #ddd;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }}
-    .dataframe th {{
-        background-color: #f2f2f2;
-    }}
-    .dataframe th:first-child {{
-        width: 250px;  /* Ajusta el ancho de la primera columna */
-    }}
-    </style>
-    {top_5_gastos_display_html}
-    """,
-    unsafe_allow_html=True
-)
+# Mostrar la tabla en la aplicación Streamlit usando st.table
+st.table(top_5_gastos_display)
