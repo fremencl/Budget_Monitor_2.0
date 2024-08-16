@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # Mostrar el logo de la compañía en el área principal
-st.image(load_image(Logo.jpg), width=300)  # Ajusta el 'width' según sea necesario
+st.image(load_image('Logo.jpg'), width=300)  # Ajusta el 'width' según sea necesario
 
 # Títulos y subtítulos
 st.write("### MONITOR DE GESTIÓN PRESUPUESTARIA :chart_with_upwards_trend:")
