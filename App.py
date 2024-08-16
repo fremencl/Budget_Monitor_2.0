@@ -19,8 +19,10 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Mostrar el logo de la compañía en el área principal
-st.image(load_image('Logo.jpg'), width=300)  # Ajusta el 'width' según sea necesario
+# Crear tres columnas y mostrar la imagen en la columna central
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image(load_image("Logo.jpg"), width=150, use_column_width=True)
 
 # Títulos y subtítulos
 st.write("### MONITOR DE GESTIÓN PRESUPUESTARIA :chart_with_upwards_trend:")
