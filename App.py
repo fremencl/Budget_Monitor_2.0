@@ -1,28 +1,31 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 
-# Configuración de la aplicación
-st.set_page_config(page_title="Aplicación Multipágina", page_icon=":bar_chart:", layout="wide")
+st.set_page_config(
+    page_title="Vehicle Incidents in England",
+    page_icon=":pickup_truck:",
+    initial_sidebar_state="expanded",
+)
 
-# Creación del menú de navegación
-with st.sidebar:
-    selected = option_menu(
-        menu_title="Menú Principal",
-        options=["Página Principal", "Analisis de Gastos", "Analisis de Ordenes"],
-        icons=["house", "bar-chart", "graph-up"],
-        menu_icon="cast",
-        default_index=0,
-    )
+st.write("# VEHICLE INCIDENTS IN ENGLAND :pickup_truck:")
 
-# Redirección a las páginas
-if selected == "Página Principal":
-    import pages.Home as Home
-    Home.app()
+st.sidebar.success("Select a demo above.")
 
-elif selected == "Analisis de Gastos":
-    import pages.Gastos as Gastos
-    Gastos.app()
+st.markdown(
+    """##### We are exploring Vehicle incidents accross england whilst utilising the capabilities of Streamlit, Snowflake, Carto and Tableau.
+    
+Click through the pages to view all towns in England based on real data, then see how this relates to Integrated Care Boards.
 
-elif selected == "Analisis de Ordenes":
-    import pages.Ordenes as Ordenes
-    Ordenes.app()
+Explore The Details of your chosen City and see how this is indexed into the H3 geospatial grid (Hexagons). Carto's Toolkit shared within Snowflake has been utilised for this. You may also see this within a radius of your chosen city.
+
+Finally, Explore How Vehicle incidents relate to fire service areas.
+
+All the raw data has been curated, engineered and processed with Snowflake. There are also 3 dashboards created using Tableau Cloud to visualise off live Snowflake data. Folium and Matplotlib has also been used for some visuals. Enjoy :smile:
+
+
+All code can be accessed here:
+
+https://github.com/beckyoconnor/Vehicle_Incidents_uk/
+
+
+"""
+)
