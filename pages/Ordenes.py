@@ -449,8 +449,8 @@ else:
 st.markdown(
     f"""
     <div style="text-align: center; border: 2px solid #ddd; padding: 10px; border-radius: 10px; background-color: {color};">
-        <h2 style="color: white;">Porcentaje de Gasto con OT</h2>
-        <p style="font-size: 24px; color: white;"><b>{porcentaje_con_ot:.2f}%</b></p>
+        <h3 style="color: white;">Porcentaje de Gasto con OT</h3>
+        <p style="font-size: 32px; color: white;"><b>{porcentaje_con_ot:.2f}%</b></p>
     </div>
     """,
     unsafe_allow_html=True
