@@ -366,9 +366,12 @@ tipo_orden_metrics_display.columns = ['Tipo de orden', 'Cantidad de ordenes', 'G
 
 # Redondear valor_ot_media a 0 decimales
 tipo_orden_metrics_display['Valor OT media'] = tipo_orden_metrics_display['Valor OT media'].round(0).astype(int)
+
+# Asegurarse de que el campo 'Mes' existe en el DataFrame filtrado
+filtered_data['Mes'] = filtered_data['Período'].astype(int)
+
 # Preparar los datos para el gráfico de columnas apiladas
-data0['Mes'] = data0['Período'].astype(int)
-data0_grouped = data0.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
+data0_grouped = filtered_data.groupby(['Mes', 'Clase de orden'])['Valor/mon.inf.'].sum().reset_index()
 data0_pivot = data0_grouped.pivot(index='Mes', columns='Clase de orden', values='Valor/mon.inf.').fillna(0)
 
 # Definir los colores específicos para cada tipo de OT
