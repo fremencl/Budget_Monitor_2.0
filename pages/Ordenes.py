@@ -395,17 +395,17 @@ st.plotly_chart(fig_columnas)
 st.markdown("### Miremos algunas métricas de nuestras Ordenes de Trabajo")
 
 # Convertir la tabla a HTML
-tipo_orden_metrics_display_html = tipo_orden_metrics_display.to_html(index=False)
+tipo_orden_metrics_display_html = tipo_orden_metrics_display.to_html(index=False, classes='table table-striped')
 
 # Aplicar estilos CSS
 st.markdown(
     f"""
     <style>
-    .dataframe {{
+    .table {{
         width: 100%;
         text-align: left;
     }}
-    .dataframe th, .dataframe td {{
+    .table th, .table td {{
         padding: 8px;
         text-align: left;
         border: 1px solid #ddd;
@@ -413,10 +413,10 @@ st.markdown(
         text-overflow: ellipsis;
         white-space: nowrap;
     }}
-    .dataframe th {{
+    .table th {{
         background-color: #f2f2f2;
     }}
-    .dataframe th:first-child {{
+    .table th:first-child {{
         width: 200px;  /* Ajusta el ancho de la primera columna */
     }}
     </style>
