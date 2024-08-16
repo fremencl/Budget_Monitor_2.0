@@ -437,5 +437,21 @@ gasto_con_ot = data_con_ot['Valor/mon.inf.'].sum()
 # Paso 4: Calcular el porcentaje del gasto con OT respecto al gasto total
 porcentaje_con_ot = (gasto_con_ot / gasto_total) * 100
 
-# Paso 5: Mostrar el porcentaje en un widget de Streamlit
-st.metric(label="Porcentaje de Gasto con OT", value=f"{porcentaje_con_ot:.2f}%", delta=None)
+# Paso 5: Definir el color basado en el porcentaje
+if porcentaje_con_ot > 80:
+    color = "green"
+elif 70 <= porcentaje_con_ot <= 80:
+    color = "yellow"
+else:
+    color = "red"
+
+# Paso 6: Mostrar el widget con estilos personalizados
+st.markdown(
+    f"""
+    <div style="text-align: center; border: 2px solid #ddd; padding: 10px; border-radius: 10px; background-color: {color};">
+        <h2 style="color: white;">Porcentaje de Gasto con OT</h2>
+        <p style="font-size: 24px; color: white;"><b>{porcentaje_con_ot:.2f}%</b></p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
