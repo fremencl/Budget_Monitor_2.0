@@ -388,16 +388,42 @@ for column in data0_pivot.columns:
         color = colores_ot.get(column, 'grey')  # Usar el color definido o 'grey' por defecto
         fig_columnas.add_trace(go.Bar(x=data0_pivot.index, y=data0_pivot[column], name=column, marker_color=color))
 
-fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden vs Presupuesto', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
+fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
 st.plotly_chart(fig_columnas)
 
-# Seccion Metricas OT
-st.markdown("#### Miremos algunas métricas de nuestras Ordenes de Trabajo")
-# Mostrar tabla metricas OT
-#st.dataframe(tipo_orden_metrics_display)
-# Mostrar tabla metricas OT sin la columna de índices
-st.dataframe(tipo_orden_metrics_display.set_index('Tipo de orden'))
+# Sección Métricas OT
+st.markdown("### Miremos algunas métricas de nuestras Ordenes de Trabajo")
 
+# Convertir la tabla a HTML
+tipo_orden_metrics_display_html = tipo_orden_metrics_display.to_html(index=False)
+
+# Aplicar estilos CSS
+st.markdown(
+    f"""
+    <style>
+    .dataframe {{
+        width: 100%;
+        text-align: left;
+    }}
+    .dataframe th, .dataframe td {{
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }}
+    .dataframe th {{
+        background-color: #f2f2f2;
+    }}
+    .dataframe th:first-child {{
+        width: 200px;  /* Ajusta el ancho de la primera columna */
+    }}
+    </style>
+    {tipo_orden_metrics_display_html}
+    """,
+    unsafe_allow_html=True
+)
 
 # Nueva sección: Tabla de los 5 mayores gastos
 st.markdown("#### Top 5 Mayores Gastos")
@@ -412,7 +438,33 @@ top_5_gastos = data0_sorted.head(5)
 # Seleccionar columnas específicas para mostrar
 top_5_gastos_display = top_5_gastos[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']]
 
-# Mostrar la tabla en la aplicación Streamlit
-#st.dataframe(top_5_gastos_display)
-# Mostrar la tabla de los 5 mayores gastos sin la columna de índices
-st.dataframe(top_5_gastos_display.set_index('Centro de coste'))
+# Convertir la tabla a HTML
+top_5_gastos_display_html = top_5_gastos_display.to_html(index=False)
+
+# Aplicar estilos CSS
+st.markdown(
+    f"""
+    <style>
+    .dataframe {{
+        width: 100%;
+        text-align: left;
+    }}
+    .dataframe th, .dataframe td {{
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }}
+    .dataframe th {{
+        background-color: #f2f2f2;
+    }}
+    .dataframe th:first-child {{
+        width: 250px;  /* Ajusta el ancho de la primera columna */
+    }}
+    </style>
+    {top_5_gastos_display_html}
+    """,
+    unsafe_allow_html=True
+)
