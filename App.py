@@ -8,7 +8,7 @@ st.set_page_config(
 )
 
 # Insertar el logo de la compañía
-load_image('assets/Logo.jpg'), use_column_width=True
+load_image("assets/Logo.jpg"), use_column_width=True
 
 # Títulos y subtítulos
 st.write("### MONITOR DE GESTIÓN PRESUPUESTARIA :chart_with_upwards_trend:")
