@@ -388,11 +388,11 @@ for column in data0_pivot.columns:
         color = colores_ot.get(column, 'grey')  # Usar el color definido o 'grey' por defecto
         fig_columnas.add_trace(go.Bar(x=data0_pivot.index, y=data0_pivot[column], name=column, marker_color=color))
 
-fig_columnas.update_layout(barmode='stack', title='Gasto Real por Tipo de Orden', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
+fig_columnas.update_layout(barmode='stack', title='', xaxis_title='Mes', yaxis_title='Gasto', legend_title='Tipo de Orden')
 st.plotly_chart(fig_columnas)
 
 # Sección Métricas OT
-st.markdown("### Miremos algunas métricas de nuestras Ordenes de Trabajo")
+st.markdown("#### Miremos algunas métricas de nuestras Ordenes de Trabajo")
 
 # Formatear las columnas "Gasto" y "Valor OT media"
 tipo_orden_metrics_display['Gasto'] = tipo_orden_metrics_display['Gasto'].apply(lambda x: f"{x:,.0f}")
@@ -423,3 +423,19 @@ top_5_gastos_display_reset = top_5_gastos_display.reset_index(drop=True)
 
 # Mostrar la tabla sin la columna de índices
 st.table(top_5_gastos_display_reset)
+
+#Widget para mostrar % edl gasto con OT
+# Paso 1: Calcular la suma del gasto total en data0
+gasto_total = data0['Valor/mon.inf.'].sum()
+
+# Paso 2: Filtrar las filas con OT asociada (donde "Orden partner" no está vacío)
+data_con_ot = data0[data0['Orden partner'].notna() & (data0['Orden partner'] != '')].copy()
+
+# Paso 3: Calcular la suma del gasto con OT
+gasto_con_ot = data_con_ot['Valor/mon.inf.'].sum()
+
+# Paso 4: Calcular el porcentaje del gasto con OT respecto al gasto total
+porcentaje_con_ot = (gasto_con_ot / gasto_total) * 100
+
+# Paso 5: Mostrar el porcentaje en un widget de Streamlit
+st.metric(label="Porcentaje de Gasto con OT", value=f"{porcentaje_con_ot:.2f}%", delta=None)
