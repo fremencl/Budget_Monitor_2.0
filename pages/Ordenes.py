@@ -414,7 +414,7 @@ st.table(tipo_orden_metrics_display_reset)
 st.markdown("#### Top 5 Mayores Gastos")
 
 # Filtrar filas con 'Centro de coste' no vacío
-data0_filtered = data0[data0['Centro de coste'].notna() & (data0['Centro de coste'] != '')]
+data0_filtered = filtered_data[filtered_data['Centro de coste'].notna() & (filtered_data['Centro de coste'] != '')]
 
 # Filtrar y ordenar data0 para obtener los 5 mayores gastos
 data0_sorted = data0_filtered.sort_values(by='Valor/mon.inf.', ascending=False)
@@ -432,10 +432,10 @@ st.table(top_5_gastos_display_reset)
 
 #Widget para mostrar % edl gasto con OT
 # Paso 1: Calcular la suma del gasto total en data0
-gasto_total = data0['Valor/mon.inf.'].sum()
+gasto_total = filtered_data['Valor/mon.inf.'].sum()
 
 # Paso 2: Filtrar las filas con OT asociada (donde "Orden partner" no está vacío)
-data_con_ot = data0[data0['Orden partner'].notna() & (data0['Orden partner'] != '')].copy()
+data_con_ot = filtered_data[filtered_data['Orden partner'].notna() & (filtered_data['Orden partner'] != '')].copy()
 
 # Paso 3: Calcular la suma del gasto con OT
 gasto_con_ot = data_con_ot['Valor/mon.inf.'].sum()
