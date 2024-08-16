@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import io
 
 # Título de la aplicación
-st.markdown("<h1 style='text-align: center; color: black; font-size: 24px;'>MONITOR GESTIÓN ORDENES</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: black; font-size: 24px;'>MONITOR GESTION ORDENES DE MANTENIMIENTO</h1>", unsafe_allow_html=True)
 
 # CSS para ajustar el ancho del sidebar
 st.markdown(
@@ -430,7 +430,30 @@ top_5_gastos_display_reset = top_5_gastos_display.reset_index(drop=True)
 # Mostrar la tabla sin la columna de índices
 st.table(top_5_gastos_display_reset)
 
-#Widget para mostrar % edl gasto con OT
+# Nueva sección: Tabla de los 5 mayores gastos del ULTIMO MES
+st.markdown("#### Top 5 Mayores Gastos del Último Mes")
+
+# Identificar el último mes con gastos reales
+ultimo_mes_con_gastos = data0_filtered['Mes'].max()
+
+# Filtrar para obtener solo los gastos del último mes con datos
+data0_filtered_ultimo_mes = data0_filtered[data0_filtered['Mes'] == ultimo_mes_con_gastos]
+
+# Ordenar y obtener los 5 mayores gastos del último mes
+data0_sorted_ultimo_mes = data0_filtered_ultimo_mes.sort_values(by='Valor/mon.inf.', ascending=False)
+top_5_gastos_ultimo_mes = data0_sorted_ultimo_mes.head(5)
+
+# Seleccionar columnas específicas para mostrar y formatear la columna "Valor/mon.inf."
+top_5_gastos_ultimo_mes_display = top_5_gastos_ultimo_mes[['Centro de coste', 'Denominación del objeto', 'Grupo_Ceco', 'Fe.contabilización', 'Valor/mon.inf.']]
+top_5_gastos_ultimo_mes_display['Valor/mon.inf.'] = top_5_gastos_ultimo_mes_display['Valor/mon.inf.'].apply(lambda x: f"{x:,.0f}")
+
+# Resetear el índice para eliminar la columna de índices y luego mostrar la tabla
+top_5_gastos_ultimo_mes_display_reset = top_5_gastos_ultimo_mes_display.reset_index(drop=True)
+
+# Mostrar la tabla sin la columna de índices
+st.table(top_5_gastos_ultimo_mes_display_reset)
+
+#Widget para mostrar % del gasto con OT
 # Paso 1: Calcular la suma del gasto total en data0
 gasto_total = filtered_data['Valor/mon.inf.'].sum()
 
